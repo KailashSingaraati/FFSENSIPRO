@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PC Sensi - FF Sens Pro</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    .pc-wrap{padding:2rem 0 5rem;}
+    .pc-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
+    .pc-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1.4rem;}
+    .pc-card h2{font-size:1.05rem;color:var(--accent);margin-bottom:1rem;}
+    .pc-form .form-group{margin-bottom:1rem;}
+    .pc-form input,.pc-form select{width:100%;background:var(--bg-dark);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:.7rem .9rem;font-family:'Rajdhani',sans-serif;font-size:1rem;}
+    .pc-actions{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.5rem;}
+    .pc-actions button{flex:1;min-width:170px;padding:.8rem;border-radius:8px;border:1px solid var(--border);background:var(--bg-card2);color:var(--text);font-family:'Orbitron',monospace;font-size:.78rem;cursor:pointer;}
+    .pc-actions button.primary{background:linear-gradient(135deg,var(--accent),#ff4500);border:none;color:#fff;}
+    .pc-values{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;}
+    .pv{background:rgba(255,107,0,.06);border:1px solid var(--border);border-radius:8px;padding:.6rem .7rem;}
+    .pv span{display:block;font-size:.78rem;color:var(--text-muted);}
+    .pv strong{font-family:'Orbitron',monospace;color:var(--accent);font-size:1.05rem;}
+    .pc-note{font-size:.86rem;color:var(--text-muted);line-height:1.55;margin-top:.9rem;}
+    .pc-tips{margin-top:1rem;padding-left:1rem;color:var(--text-muted);}
+    .pc-tips li{margin:.25rem 0;}
+    @media (max-width:900px){.pc-grid{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-logo"><span>FF<span class="accent">Sens</span>Pro</span></div>
+    <div class="nav-toggle" id="navToggle">&#9776;</div>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="generator.html">Generator</a></li>
+      <li><a href="headshot-generator.html">🎯 Headshot Gen</a></li>
+      <li><a href="best-sensitivity.html">Best Sens</a></li>
+      <li><a href="sensi-by-phone.html">📱 Sensi by Phone</a></li>
+      <li><a href="pc-sensi.html" class="active">🖥️ PC Sensi</a></li>
+      <li><a href="lag-fix.html">Lag Fix</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+  </nav>
+
+  <div class="page-header">
+    <h1>🖥️ <span class="accent">PC Sensi</span> (Bluestacks)</h1>
+    <p>Optimized Free Fire sensitivity + emulator controls for PC gamers</p>
+  </div>
+
+  <section class="pc-wrap">
+    <div class="container">
+      <div class="pc-grid">
+        <div class="pc-card pc-form">
+          <h2>⚙️ PC Generator</h2>
+          <div class="form-group">
+            <label>Mouse DPI</label>
+            <input type="number" id="pcDpi" min="400" max="3200" value="800" />
+          </div>
+          <div class="form-group">
+            <label>Bluestacks Mouse Sens (0.5 - 2.0)</label>
+            <input type="number" id="pcEmuSens" min="0.5" max="2" step="0.05" value="1" />
+          </div>
+          <div class="form-group">
+            <label>FPS Mode</label>
+            <select id="pcFps"><option value="60">60 FPS</option><option value="90">90 FPS</option><option value="120">120 FPS</option></select>
+          </div>
+          <div class="form-group">
+            <label>Play Style</label>
+            <select id="pcStyle"><option value="balanced">Balanced</option><option value="rush">Rush</option><option value="sniper">Sniper</option></select>
+          </div>
+          <div class="pc-actions">
+            <button class="primary" onclick="generatePcSens()">Generate PC Sensi</button>
+            <button onclick="copyPcSens()">Copy Settings</button>
+          </div>
+          <p class="pc-note">Tip: If recoil still jumps, reduce Red Dot and 2x by 3-5. If flick feels slow, increase General by 2-4.</p>
+        </div>
+
+        <div class="pc-card">
+          <h2>🎯 Your PC Sensitivity</h2>
+          <div class="pc-values">
+            <div class="pv"><span>General</span><strong id="pcGeneral">95</strong></div>
+            <div class="pv"><span>Red Dot</span><strong id="pcRedDot">88</strong></div>
+            <div class="pv"><span>2x Scope</span><strong id="pc2x">78</strong></div>
+            <div class="pv"><span>4x Scope</span><strong id="pc4x">64</strong></div>
+            <div class="pv"><span>AWM Scope</span><strong id="pcAwm">40</strong></div>
+            <div class="pv"><span>Free Look</span><strong id="pcFreeLook">92</strong></div>
+          </div>
+          <ul class="pc-tips">
+            <li>Use 1280x720 or 1600x900 for better input latency.</li>
+            <li>Enable dedicated GPU and High FPS mode in Bluestacks.</li>
+            <li>Keep in-game aim precision ON and reduce motion blur effects.</li>
+            <li>Practice drag shot in training for 8-10 mins daily.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-logo">FF<span class="accent">Sens</span>Pro</div>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="generator.html">Generator</a>
+        <a href="headshot-generator.html">🎯 Headshot Gen</a>
+        <a href="best-sensitivity.html">Best Sens</a>
+        <a href="sensi-by-phone.html">📱 Sensi by Phone</a>
+        <a href="pc-sensi.html">🖥️ PC Sensi</a>
+        <a href="lag-fix.html">Lag Fix</a>
+        <a href="about.html">About</a>
+      </div>
+      <p class="copy">© 2024 FFSensPro. Not affiliated with Garena Free Fire.</p>
+    </div>
+  </footer>
+
+  <script>(function(){try{var s=JSON.parse(localStorage.getItem("ffsp_session")||"null");if(!s||!s.loggedIn||!s.subscribed){localStorage.removeItem("ffsp_session");sessionStorage.clear();window.location.replace("login.html");}}catch(e){localStorage.removeItem("ffsp_session");sessionStorage.clear();window.location.replace("login.html");}})();</script>
+  <script src="main.js"></script>
+  <script>
+    function clamp(v,min,max){return Math.min(max,Math.max(min,v));}
+    function generatePcSens(){
+      var dpi = parseInt(document.getElementById('pcDpi').value || '800', 10);
+      var emu = parseFloat(document.getElementById('pcEmuSens').value || '1');
+      var fps = parseInt(document.getElementById('pcFps').value || '60', 10);
+      var style = document.getElementById('pcStyle').value;
+
+      dpi = clamp(dpi, 400, 3200);
+      emu = clamp(emu, 0.5, 2);
+      var dpiFactor = 800 / dpi;
+      var emuFactor = 1 / emu;
+      var fpsFactor = fps === 120 ? 1.06 : (fps === 90 ? 1.03 : 1);
+      var base = 95 * dpiFactor * emuFactor * fpsFactor;
+
+      var values = {
+        general: Math.round(base),
+        redDot: Math.round(base * 0.93),
+        scope2x: Math.round(base * 0.82),
+        scope4x: Math.round(base * 0.67),
+        awm: Math.round(base * 0.42),
+        freeLook: Math.round(base * 0.97)
+      };
+
+      if (style === 'rush') {
+        values.general += 5; values.redDot += 4; values.scope2x += 2;
+      } else if (style === 'sniper') {
+        values.general -= 6; values.redDot -= 6; values.scope4x -= 4; values.awm -= 3;
+      }
+
+      values.general = clamp(values.general, 60, 200);
+      values.redDot = clamp(values.redDot, 55, 200);
+      values.scope2x = clamp(values.scope2x, 45, 200);
+      values.scope4x = clamp(values.scope4x, 35, 180);
+      values.awm = clamp(values.awm, 20, 140);
+      values.freeLook = clamp(values.freeLook, 55, 200);
+
+      document.getElementById('pcGeneral').textContent = values.general;
+      document.getElementById('pcRedDot').textContent = values.redDot;
+      document.getElementById('pc2x').textContent = values.scope2x;
+      document.getElementById('pc4x').textContent = values.scope4x;
+      document.getElementById('pcAwm').textContent = values.awm;
+      document.getElementById('pcFreeLook').textContent = values.freeLook;
+    }
+
+    function copyPcSens(){
+      var text = [
+        'FF SENSI PRO - PC (BLUESTACKS)',
+        '--------------------------------',
+        'General   : ' + document.getElementById('pcGeneral').textContent,
+        'Red Dot   : ' + document.getElementById('pcRedDot').textContent,
+        '2x Scope  : ' + document.getElementById('pc2x').textContent,
+        '4x Scope  : ' + document.getElementById('pc4x').textContent,
+        'AWM Scope : ' + document.getElementById('pcAwm').textContent,
+        'Free Look : ' + document.getElementById('pcFreeLook').textContent
+      ].join('\n');
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text);
+      } else {
+        var ta = document.createElement('textarea');
+        ta.value = text; ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+        document.body.appendChild(ta); ta.focus(); ta.select();
+        try { document.execCommand('copy'); } catch(e){}
+        document.body.removeChild(ta);
+      }
+      alert('PC sensitivity copied.');
+    }
+    generatePcSens();
+  </script>
+</body>
+</html>

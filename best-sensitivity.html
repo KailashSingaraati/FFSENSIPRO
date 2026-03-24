@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Best Sensitivity List - FF Sens Pro</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-logo"><span>FF<span class="accent">Sens</span>Pro</span></div>
+    <div class="nav-toggle" id="navToggle">&#9776;</div>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="generator.html">Generator</a></li>
+      <li><a href="headshot-generator.html">🎯 Headshot Gen</a></li>
+      <li><a href="best-sensitivity.html" class="active">Best Sens</a></li>
+      <li><a href="sensi-by-phone.html">📱 Sensi by Phone</a></li>
+      <li><a href="pc-sensi.html">🖥️ PC Sensi</a></li>
+      <li><a href="lag-fix.html">Lag Fix</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+  </nav>
+
+  <div class="page-header">
+    <h1>🏆 Best <span class="accent">Sensitivity</span> List</h1>
+    <p>Top sensitivity settings by device type and play style</p>
+  </div>
+
+  <section class="best-sens-section">
+    <div class="container">
+
+      <!-- FILTER TABS -->
+      <div class="filter-tabs">
+        <button class="tab-btn active" onclick="filterSens('all', this)">All</button>
+        <button class="tab-btn" onclick="filterSens('rush', this)">Rush</button>
+        <button class="tab-btn" onclick="filterSens('sniper', this)">Sniper</button>
+        <button class="tab-btn" onclick="filterSens('balanced', this)">Balanced</button>
+        <button class="tab-btn" onclick="filterSens('pro', this)">Pro Player</button>
+      </div>
+
+      <!-- SENSITIVITY CARDS -->
+      <div class="sens-cards-grid" id="sensCardsGrid">
+
+        <div class="sens-card" data-type="rush pro">
+          <div class="card-badge pro">⭐ Pro</div>
+          <div class="card-header">
+            <h3>Rush Fighter Sens</h3>
+            <span class="card-tag rush">Rush</span>
+          </div>
+          <div class="card-device">Best for: 4GB+ RAM | 60/90 FPS</div>
+          <div class="card-values">
+            <div class="cv"><span>General</span><strong>176</strong></div>
+            <div class="cv"><span>Red Dot</span><strong>152</strong></div>
+            <div class="cv"><span>2x Scope</span><strong>136</strong></div>
+            <div class="cv"><span>4x Scope</span><strong>108</strong></div>
+            <div class="cv"><span>AWM Scope</span><strong>64</strong></div>
+            <div class="cv"><span>Free Look</span><strong>160</strong></div>
+          </div>
+          <div class="card-tip">💡 High sensitivity for fast flicks and close combat</div>
+          <button class="btn-copy-card" onclick="copyCard(this)">Copy</button>
+        </div>
+
+        <div class="sens-card" data-type="sniper">
+          <div class="card-header">
+            <h3>Sniper King Sens</h3>
+            <span class="card-tag sniper">Sniper</span>
+          </div>
+          <div class="card-device">Best for: Any RAM | 30/60 FPS</div>
+          <div class="card-values">
+            <div class="cv"><span>General</span><strong>110</strong></div>
+            <div class="cv"><span>Red Dot</span><strong>96</strong></div>
+            <div class="cv"><span>2x Scope</span><strong>80</strong></div>
+            <div class="cv"><span>4x Scope</span><strong>56</strong></div>
+            <div class="cv"><span>AWM Scope</span><strong>36</strong></div>
+            <div class="cv"><span>Free Look</span><strong>120</strong></div>
+          </div>
+          <div class="card-tip">💡 Low sensitivity = more precise long-range shots</div>
+          <button class="btn-copy-card" onclick="copyCard(this)">Copy</button>
+        </div>
+
+        <div class="sens-card" data-type="balanced">
+          <div class="card-header">
+            <h3>Balanced Pro Sens</h3>
+            <span class="card-tag balanced">Balanced</span>
+          </div>
+          <div class="card-device">Best for: 3-6GB RAM | 60 FPS</div>
+          <div class="card-values">
+            <div class="cv"><span>General</span><strong>144</strong></div>
+            <div class="cv"><span>Red Dot</span><strong>124</strong></div>
+            <div class="cv"><span>2x Scope</span><strong>110</strong></div>
+            <div class="cv"><span>4x Scope</span><strong>84</strong></div>
+            <div class="cv"><span>AWM Scope</span><strong>50</strong></div>
+            <div class="cv"><span>Free Look</span><strong>140</strong></div>
+          </div>
+          <div class="card-tip">💡 Perfect mix of speed and accuracy</div>
+          <button class="btn-copy-card" onclick="copyCard(this)">Copy</button>
+        </div>
+
+        <div class="sens-card" data-type="rush">
+          <div class="card-header">
+            <h3>Low-End Rush Sens</h3>
+            <span class="card-tag rush">Rush</span>
+          </div>
+          <div class="card-device">Best for: 2-3GB RAM | 30 FPS</div>
+          <div class="card-values">
+            <div class="cv"><span>General</span><strong>156</strong></div>
+            <div class="cv"><span>Red Dot</span><strong>132</strong></div>
+            <div class="cv"><span>2x Scope</span><strong>116</strong></div>
+            <div class="cv"><span>4x Scope</span><strong>88</strong></div>
+            <div class="cv"><span>AWM Scope</span><strong>52</strong></div>
+            <div class="cv"><span>Free Look</span><strong>144</strong></div>
+          </div>
+          <div class="card-tip">💡 Tuned for smooth performance on low-end phones</div>
+          <button class="btn-copy-card" onclick="copyCard(this)">Copy</button>
+        </div>
+
+        <div class="sens-card" data-type="pro">
+          <div class="card-badge pro">⭐ Pro</div>
+          <div class="card-header">
+            <h3>Pro Gamer Elite Sens</h3>
+            <span class="card-tag pro">Pro</span>
+          </div>
+          <div class="card-device">Best for: 8GB+ RAM | 90 FPS</div>
+          <div class="card-values">
+            <div class="cv"><span>General</span><strong>190</strong></div>
+            <div class="cv"><span>Red Dot</span><strong>164</strong></div>
+            <div class="cv"><span>2x Scope</span><strong>148</strong></div>
+            <div class="cv"><span>4x Scope</span><strong>120</strong></div>
+            <div class="cv"><span>AWM Scope</span><strong>76</strong></div>
+            <div class="cv"><span>Free Look</span><strong>176</strong></div>
+          </div>
+          <div class="card-tip">💡 Maximum speed for high-end device users</div>
+          <button class="btn-copy-card" onclick="copyCard(this)">Copy</button>
+        </div>
+
+        <div class="sens-card" data-type="sniper balanced">
+          <div class="card-header">
+            <h3>Mid-Range All-Round</h3>
+            <span class="card-tag balanced">Balanced</span>
+          </div>
+          <div class="card-device">Best for: 4GB RAM | 60 FPS</div>
+          <div class="card-values">
+            <div class="cv"><span>General</span><strong>136</strong></div>
+            <div class="cv"><span>Red Dot</span><strong>116</strong></div>
+            <div class="cv"><span>2x Scope</span><strong>100</strong></div>
+            <div class="cv"><span>4x Scope</span><strong>76</strong></div>
+            <div class="cv"><span>AWM Scope</span><strong>44</strong></div>
+            <div class="cv"><span>Free Look</span><strong>130</strong></div>
+          </div>
+          <div class="card-tip">💡 Great for both sniping and mid-range fights</div>
+          <button class="btn-copy-card" onclick="copyCard(this)">Copy</button>
+        </div>
+
+      </div>
+
+      <!-- COPY TOAST -->
+      <div class="copy-toast hidden" id="globalToast">✅ Sensitivity Copied!</div>
+
+      <!-- INFO BOX -->
+      <div class="info-box">
+        <h3>📌 Pro Tip</h3>
+        <p>After applying any sensitivity, go to <strong>Training Mode → Practice Range</strong> and shoot at least 100 targets before judging the settings. Your muscle memory needs time to adapt. Adjust ±5 based on comfort.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-logo">FF<span class="accent">Sens</span>Pro</div>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="generator.html">Generator</a>
+        <a href="headshot-generator.html">🎯 Headshot Gen</a>
+        <a href="best-sensitivity.html">Best Sens</a>
+        <a href="sensi-by-phone.html">📱 Sensi by Phone</a>
+        <a href="pc-sensi.html">🖥️ PC Sensi</a>
+        <a href="lag-fix.html">Lag Fix</a>
+        <a href="about.html">About</a>
+      </div>
+      <p class="copy">© 2024 FFSensPro. Not affiliated with Garena Free Fire.</p>
+    </div>
+  </footer>
+
+  <script>(function(){try{var s=JSON.parse(localStorage.getItem("ffsp_session")||"null");if(!s||!s.loggedIn||!s.subscribed){localStorage.removeItem("ffsp_session");sessionStorage.clear();window.location.replace("login.html");}}catch(e){localStorage.removeItem("ffsp_session");sessionStorage.clear();window.location.replace("login.html");}})();</script>
+<script src="best-sensitivity.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>

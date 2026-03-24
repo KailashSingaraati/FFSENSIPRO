@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sensi by Phone Model - FF Sens Pro</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    .phone-search-section { padding: 2rem 0 4rem; }
+    .search-hero {
+      background: linear-gradient(135deg, rgba(255,107,0,0.08), rgba(0,200,255,0.06));
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    .search-hero h2 { font-size: 1rem; color: var(--text-muted); font-family: 'Rajdhani', sans-serif; margin-bottom: 1rem; font-weight: 600; }
+    .search-input-wrap { position: relative; }
+    .search-icon { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); font-size: 1.1rem; pointer-events: none; z-index: 1; }
+    #phoneSearchInput {
+      width: 100%; background: var(--bg-card); border: 2px solid var(--border); border-radius: 12px;
+      color: var(--text); font-family: 'Rajdhani', sans-serif; font-size: 1.05rem; font-weight: 600;
+      padding: 0.9rem 1rem 0.9rem 3rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    #phoneSearchInput:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255,107,0,0.15); }
+    #phoneSearchInput::placeholder { color: var(--text-muted); font-weight: 500; }
+    .autocomplete-list {
+      position: absolute; left: 0; right: 0; top: calc(100% + 6px);
+      background: #161b2e; border: 1px solid rgba(255,107,0,0.4);
+      border-radius: 14px; max-height: 300px; overflow-y: auto;
+      z-index: 9999; display: none; box-shadow: 0 12px 40px rgba(0,0,0,0.7);
+    }
+    .autocomplete-list.show { display: block; }
+    .autocomplete-item {
+      padding: 0.75rem 1.1rem; cursor: pointer; display: flex; align-items: center;
+      gap: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.15s;
+    }
+    .autocomplete-item:last-child { border-bottom: none; }
+    .autocomplete-item:hover, .autocomplete-item.highlighted { background: rgba(255,107,0,0.12); }
+    .ac-brand { font-size:0.7rem; color:var(--accent); font-weight:800; text-transform:uppercase; letter-spacing:1px; min-width:58px; }
+    .ac-model { font-size:0.95rem; color:var(--text); font-weight:600; flex:1; }
+    .ac-specs { font-size:0.72rem; color:var(--text-muted); background:rgba(0,200,255,0.08); border:1px solid var(--border-blue); padding:0.1rem 0.45rem; border-radius:4px; white-space:nowrap; }
+    .brand-filter-row { display:flex; gap:0.45rem; flex-wrap:wrap; margin-top:1.2rem; align-items:center; }
+    .brand-chip {
+      background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted);
+      padding: 0.3rem 0.85rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700;
+      cursor: pointer; transition: all 0.2s; font-family: 'Rajdhani', sans-serif;
+    }
+    .brand-chip:hover, .brand-chip.active { background: rgba(255,107,0,0.15); border-color: var(--accent); color: var(--accent); }
+    .result-placeholder { text-align: center; padding: 3rem 2rem; color: var(--text-muted); background: var(--bg-card); border-radius: 16px; border: 1px dashed rgba(255,107,0,0.2); margin-bottom: 1.5rem; }
+    .result-placeholder .ph-icon { font-size:3rem; margin-bottom:0.7rem; }
+    .phone-result-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; display: none; animation: slideUp 0.35s ease; margin-bottom: 1.5rem; }
+    .phone-result-card.show { display: block; }
+    @keyframes slideUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+    .phone-result-header { background: linear-gradient(135deg, rgba(255,107,0,0.15), rgba(0,200,255,0.08)); border-bottom: 1px solid var(--border); padding: 1.4rem 2rem; display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    .phone-title-group h2 { font-size:1.25rem; color:var(--text); font-family:'Orbitron',monospace; }
+    .phone-specs-row { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.6rem; }
+    .spec-chip { font-size: 0.74rem; padding: 0.22rem 0.6rem; border-radius: 6px; font-weight: 700; font-family: 'Rajdhani', sans-serif; display: inline-block; white-space: nowrap; }
+    .spec-chip.ram  { background:rgba(0,200,255,0.14); color:var(--blue); border:1px solid var(--border-blue); }
+    .spec-chip.fps  { background:rgba(0,255,136,0.12); color:var(--green); border:1px solid rgba(0,255,136,0.28); }
+    .spec-chip.dpi  { background:rgba(255,107,0,0.12); color:var(--accent); border:1px solid var(--border); }
+    .spec-chip.chip { background:rgba(255,214,0,0.1); color:var(--yellow); border:1px solid rgba(255,214,0,0.28); }
+    .spec-chip.tier { background:rgba(180,100,255,0.12); color:#cc88ff; border:1px solid rgba(180,100,255,0.28); }
+    .spec-chip.disp { background:rgba(255,51,102,0.1); color:#ff7799; border:1px solid rgba(255,51,102,0.25); }
+    .phone-brand-abbr { font-family:'Orbitron',monospace; font-size:2rem; color:var(--accent); opacity:0.35; font-weight:900; letter-spacing:2px; }
+    .phone-sens-body { padding:1.6rem 2rem; }
+    .sens-section-label { font-size:0.76rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:2px; margin-bottom:1.2rem; display:flex; align-items:center; gap:0.6rem; }
+    .sens-section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+    .phone-sens-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+    @media (max-width:600px) { .phone-sens-grid { grid-template-columns: repeat(2,1fr); } }
+    .psens-item { background: var(--bg-card2); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 1.1rem 0.9rem; text-align: center; transition: border-color 0.2s, transform 0.2s; }
+    .psens-item:hover { border-color:var(--accent); transform:translateY(-2px); }
+    .psens-label { font-size:0.72rem; color:var(--text-muted); font-weight:600; margin-bottom:0.45rem; }
+    .psens-value { font-family:'Orbitron',monospace; font-size:2rem; font-weight:900; color:var(--accent); line-height:1; margin-bottom:0.5rem; }
+    .psens-bar-track { height:4px; background:rgba(255,255,255,0.06); border-radius:2px; overflow:hidden; }
+    .psens-bar-fill { height:100%; border-radius:2px; background:linear-gradient(90deg,var(--accent),var(--accent2)); width:0%; transition:width 0.85s cubic-bezier(0.16,1,0.3,1); }
+    .phone-tips-box { background:rgba(0,200,255,0.05); border:1px solid var(--border-blue); border-radius:12px; padding:1.1rem 1.3rem; margin-bottom:1.5rem; }
+    .phone-tips-box h4 { color:var(--blue); font-size:0.9rem; margin-bottom:0.6rem; font-family:'Rajdhani',sans-serif; font-weight:700; }
+    .phone-tips-box ul { list-style:none; display:flex; flex-direction:column; gap:0.35rem; }
+    .phone-tips-box li { font-size:0.88rem; color:var(--text-muted); padding-left:1.2rem; position:relative; }
+    .phone-tips-box li::before { content:'›'; position:absolute; left:0; color:var(--accent); font-weight:700; }
+    .phone-result-actions { display:flex; gap:0.8rem; flex-wrap:wrap; }
+    .phones-grid-section { margin-top:2.5rem; }
+    .phones-list-header { font-size:0.82rem; color:var(--text-muted); font-family:'Rajdhani',sans-serif; font-weight:700; margin-bottom:1rem; text-transform:uppercase; letter-spacing:1.5px; display:flex; align-items:center; gap:0.5rem; }
+    .phones-count-badge { background:rgba(255,107,0,0.15); color:var(--accent); border:1px solid var(--border); padding:0.15rem 0.55rem; border-radius:20px; font-size:0.75rem; }
+    .phones-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:0.7rem; }
+    .phone-list-item { background:var(--bg-card); border:1px solid rgba(255,255,255,0.05); border-radius:11px; padding:0.85rem 1rem; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:0.7rem; }
+    .phone-list-item:hover { border-color:var(--accent); background:rgba(255,107,0,0.07); transform:translateX(3px); }
+    .pli-brand { font-size:0.68rem; font-weight:800; color:var(--accent); text-transform:uppercase; letter-spacing:1px; min-width:48px; }
+    .pli-name { font-size:0.88rem; color:var(--text); font-weight:600; flex:1; }
+    .pli-ram { font-size:0.73rem; color:var(--text-muted); }
+    #copyToast { position:fixed; bottom:2rem; left:50%; transform:translateX(-50%); background:var(--bg-card2); border:1px solid var(--green); color:var(--green); padding:0.7rem 1.5rem; border-radius:30px; font-weight:700; font-size:0.9rem; z-index:9999; }
+    .hidden { display:none !important; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-logo"><span>FF<span class="accent">Sens</span>Pro</span></div>
+    <div class="nav-toggle" id="navToggle">&#9776;</div>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="generator.html">Generator</a></li>
+      <li><a href="headshot-generator.html">🎯 Headshot Gen</a></li>
+      <li><a href="best-sensitivity.html">Best Sens</a></li>
+      <li><a href="sensi-by-phone.html" class="active">📱 Sensi by Phone</a></li>
+      <li><a href="pc-sensi.html">🖥️ PC Sensi</a></li>
+      <li><a href="lag-fix.html">Lag Fix</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+  </nav>
+
+  <div class="page-header">
+    <h1>📱 Sensi by <span class="accent">Phone Model</span></h1>
+    <p>300+ phones from 2018–2026 — instant optimized sensitivity for your exact device</p>
+  </div>
+
+  <section class="phone-search-section">
+    <div class="container">
+      <div class="search-hero">
+        <h2>🔍 Search Your Phone Model</h2>
+        <div class="search-input-wrap">
+          <span class="search-icon">📱</span>
+          <input type="text" id="phoneSearchInput"
+            placeholder="e.g. Redmi Note 13, Samsung A55, iQOO Neo 10, Nothing Phone 2a..."
+            autocomplete="off" spellcheck="false" />
+          <div class="autocomplete-list" id="autocompleteList"></div>
+        </div>
+
+        <div class="brand-filter-row">
+          <span style="font-size:0.78rem;color:var(--text-muted);font-weight:600">Brands:</span>
+          <button class="brand-chip active" onclick="filterBrand('')">All</button>
+          <button class="brand-chip" onclick="filterBrand('Redmi')">Redmi</button>
+          <button class="brand-chip" onclick="filterBrand('Samsung')">Samsung</button>
+          <button class="brand-chip" onclick="filterBrand('Realme')">Realme</button>
+          <button class="brand-chip" onclick="filterBrand('OPPO')">OPPO</button>
+          <button class="brand-chip" onclick="filterBrand('Vivo')">Vivo</button>
+          <button class="brand-chip" onclick="filterBrand('OnePlus')">OnePlus</button>
+          <button class="brand-chip" onclick="filterBrand('Poco')">POCO</button>
+          <button class="brand-chip" onclick="filterBrand('iPhone')">iPhone</button>
+          <button class="brand-chip" onclick="filterBrand('Motorola')">Moto</button>
+          <button class="brand-chip" onclick="filterBrand('Infinix')">Infinix</button>
+          <button class="brand-chip" onclick="filterBrand('Tecno')">Tecno</button>
+          <button class="brand-chip" onclick="filterBrand('iQOO')">iQOO</button>
+          <button class="brand-chip" onclick="filterBrand('Nothing')">Nothing</button>
+          <button class="brand-chip" onclick="filterBrand('Google')">Google</button>
+          <button class="brand-chip" onclick="filterBrand('Lava')">Lava</button>
+          <button class="brand-chip" onclick="filterBrand('Xiaomi')">Xiaomi</button>
+        </div>
+      </div>
+
+      <div id="resultPlaceholder" class="result-placeholder">
+        <div class="ph-icon">🔍</div>
+        <p>Type your phone model above to get perfectly tuned sensitivity settings</p>
+      </div>
+
+      <div class="phone-result-card" id="phoneResultCard">
+        <div class="phone-result-header">
+          <div class="phone-title-group">
+            <h2 id="phoneResultName">-</h2>
+            <div class="phone-specs-row" id="phoneSpecsRow"></div>
+          </div>
+          <div class="phone-brand-abbr" id="phoneBrandAbbr">-</div>
+        </div>
+        <div class="phone-sens-body">
+          <div class="sens-section-label">Optimized Sensitivity Settings</div>
+          <div class="phone-sens-grid" id="phoneSensGrid"></div>
+          <div class="phone-tips-box">
+            <h4>💡 Tips for Your Phone</h4>
+            <ul id="phoneTipsList"></ul>
+          </div>
+          <div class="phone-result-actions">
+            <button class="btn-primary" onclick="copyPhoneSens()">📋 Copy Settings</button>
+            <a href="generator.html" class="btn-secondary">⚙️ Custom Generator</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="phones-grid-section">
+        <div class="phones-list-header">
+          <span id="phonesListTitle">All Supported Phones</span>
+          <span class="phones-count-badge" id="phonesCountBadge">0</span>
+        </div>
+        <div class="phones-grid" id="phonesGrid"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="copy-toast hidden" id="copyToast">✅ Sensitivity Copied!</div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-logo">FF<span class="accent">Sens</span>Pro</div>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="generator.html">Generator</a>
+        <a href="headshot-generator.html">🎯 Headshot Gen</a>
+        <a href="best-sensitivity.html">Best Sens</a>
+        <a href="sensi-by-phone.html">📱 Sensi by Phone</a>
+        <a href="pc-sensi.html">🖥️ PC Sensi</a>
+        <a href="lag-fix.html">Lag Fix</a>
+        <a href="about.html">About</a>
+      </div>
+      <p class="copy">© 2024 FFSensPro. Not affiliated with Garena Free Fire.</p>
+    </div>
+  </footer>
+
+<script>
+// ════════════════════════════════════════════════════════
+//  300+ PHONES DATABASE  (2018–2026, all major brands)
+// ════════════════════════════════════════════════════════
+var PHONES = [
+
+// ── REDMI (30) ──
+{brand:'Redmi',model:'Note 14 Pro+',ram:12,dpi:452,fps:90,chip:'Snapdragon 7s Gen 3',display:'AMOLED 120Hz',tier:'High',sens:{general:172,redDot:148,scope2x:128,scope4x:98,awm:62,freeLook:162},tips:['SD 7s Gen 3 handles 90 FPS perfectly','High DPI: lower scope values give best precision','Enable MIUI Game Turbo for max performance']},
+{brand:'Redmi',model:'Note 14 Pro',ram:8,dpi:452,fps:90,chip:'Dimensity 7300 Ultra',display:'AMOLED 120Hz',tier:'High',sens:{general:166,redDot:142,scope2x:124,scope4x:94,awm:60,freeLook:156},tips:['Dimensity 7300 Ultra smooth at 90 FPS','120Hz AMOLED improves headshot reaction time','Enable Game Turbo in MIUI settings']},
+{brand:'Redmi',model:'Note 14',ram:6,dpi:402,fps:60,chip:'Snapdragon 685',display:'AMOLED 90Hz',tier:'Mid',sens:{general:152,redDot:130,scope2x:112,scope4x:86,awm:54,freeLook:142},tips:['SD685 stable at 60 FPS Medium graphics','90Hz display adds touch responsiveness','Good balanced settings for all-round play']},
+{brand:'Redmi',model:'Note 13 Pro+',ram:8,dpi:452,fps:90,chip:'Dimensity 7200 Ultra',display:'AMOLED 120Hz',tier:'High',sens:{general:170,redDot:144,scope2x:126,scope4x:96,awm:62,freeLook:160},tips:['90 FPS stable on Dimensity 7200 Ultra','Lower scope compensates for 452 DPI','MIUI Game Turbo: ON always']},
+{brand:'Redmi',model:'Note 13 Pro',ram:8,dpi:452,fps:60,chip:'Dimensity 7200',display:'AMOLED 120Hz',tier:'High',sens:{general:164,redDot:140,scope2x:122,scope4x:94,awm:60,freeLook:154},tips:['Excellent mid-ranger for Free Fire','120Hz AMOLED great for dark zone fights','Try enabling 90 FPS in settings']},
+{brand:'Redmi',model:'Note 13',ram:6,dpi:402,fps:60,chip:'Snapdragon 685',display:'AMOLED 90Hz',tier:'Mid',sens:{general:154,redDot:132,scope2x:114,scope4x:86,awm:54,freeLook:144},tips:['AMOLED + 90Hz great at this price range','SD685 keeps 60 FPS very stable','Fine-tune ±5 based on comfort']},
+{brand:'Redmi',model:'Note 12 Pro+',ram:8,dpi:452,fps:60,chip:'Dimensity 1080',display:'AMOLED 120Hz',tier:'High',sens:{general:160,redDot:136,scope2x:118,scope4x:90,awm:58,freeLook:150},tips:['Dimensity 1080 handles 60 FPS excellently','120Hz AMOLED great for fast aim tracking']},
+{brand:'Redmi',model:'Note 12 Pro',ram:6,dpi:395,fps:60,chip:'Dimensity 1080',display:'AMOLED 120Hz',tier:'Mid+',sens:{general:156,redDot:134,scope2x:116,scope4x:88,awm:56,freeLook:146},tips:['Dimensity 1080 runs FF at 60 FPS smoothly','AMOLED gives edge in dark building fights']},
+{brand:'Redmi',model:'Note 12',ram:4,dpi:395,fps:60,chip:'Snapdragon 4 Gen 1',display:'AMOLED 120Hz',tier:'Mid',sens:{general:148,redDot:126,scope2x:110,scope4x:84,awm:52,freeLook:140},tips:['Set graphics to Medium for stable 60 FPS','Enable MIUI Game Turbo before launching']},
+{brand:'Redmi',model:'Note 11 Pro+',ram:6,dpi:395,fps:60,chip:'Helio G96',display:'AMOLED 120Hz',tier:'Mid+',sens:{general:152,redDot:130,scope2x:112,scope4x:86,awm:54,freeLook:142},tips:['Helio G96 with AMOLED great combo','120Hz helps with touch response accuracy']},
+{brand:'Redmi',model:'Note 11 Pro',ram:6,dpi:395,fps:60,chip:'Snapdragon 695',display:'AMOLED 120Hz',tier:'Mid+',sens:{general:152,redDot:130,scope2x:112,scope4x:86,awm:54,freeLook:142},tips:['SD695 handles 60 FPS without heating','Good all-round sensitivity']},
+{brand:'Redmi',model:'Note 11',ram:4,dpi:395,fps:60,chip:'Snapdragon 680',display:'AMOLED 90Hz',tier:'Mid',sens:{general:144,redDot:122,scope2x:106,scope4x:80,awm:48,freeLook:136},tips:['SD680 AMOLED combo smooth at 60 FPS','90Hz panel adds responsiveness']},
+{brand:'Redmi',model:'Note 10 Pro',ram:6,dpi:395,fps:60,chip:'Snapdragon 732G',display:'AMOLED 120Hz',tier:'Mid+',sens:{general:154,redDot:132,scope2x:114,scope4x:86,awm:54,freeLook:144},tips:['SD732G gaming chip great for FF','120Hz Super AMOLED best in class']},
+{brand:'Redmi',model:'Note 10',ram:4,dpi:395,fps:60,chip:'Snapdragon 678',display:'AMOLED 60Hz',tier:'Mid',sens:{general:142,redDot:120,scope2x:104,scope4x:78,awm:46,freeLook:134},tips:['Good value phone — Medium graphics','AMOLED: high contrast in dark zones']},
+{brand:'Redmi',model:'Note 9 Pro',ram:4,dpi:403,fps:60,chip:'Snapdragon 720G',display:'IPS 60Hz',tier:'Mid',sens:{general:150,redDot:128,scope2x:110,scope4x:84,awm:52,freeLook:140},tips:['SD720G gaming chip very capable','Still a solid FF phone in 2024']},
+{brand:'Redmi',model:'Note 8 Pro',ram:6,dpi:395,fps:60,chip:'Helio G90T',display:'IPS 60Hz',tier:'Mid+',sens:{general:152,redDot:130,scope2x:112,scope4x:86,awm:54,freeLook:142},tips:['Helio G90T first gaming chip for Redmi','Still capable for 60 FPS gameplay']},
+{brand:'Redmi',model:'13C',ram:4,dpi:269,fps:60,chip:'Helio G85',display:'IPS 90Hz',tier:'Low-Mid',sens:{general:138,redDot:116,scope2x:100,scope4x:74,awm:44,freeLook:130},tips:['Helio G85 at Low-Medium for stable 60 FPS','Close all background apps before gaming']},
+{brand:'Redmi',model:'12C',ram:4,dpi:269,fps:30,chip:'Helio G85',display:'IPS 60Hz',tier:'Low-Mid',sens:{general:132,redDot:110,scope2x:94,scope4x:70,awm:40,freeLook:124},tips:['Stick to 30 FPS Low graphics','Turn off WiFi calling before gaming']},
+{brand:'Redmi',model:'10C',ram:4,dpi:269,fps:30,chip:'Snapdragon 680',display:'IPS 60Hz',tier:'Low-Mid',sens:{general:136,redDot:114,scope2x:98,scope4x:74,awm:44,freeLook:128},tips:['SD680 better than Helio at same price','Low graphics for consistent 30 FPS']},
+{brand:'Redmi',model:'9A',ram:2,dpi:270,fps:30,chip:'Helio G25',display:'IPS 60Hz',tier:'Low',sens:{general:130,redDot:110,scope2x:94,scope4x:72,awm:40,freeLook:120},tips:['Lowest graphics only','Close ALL apps before Free Fire','Developer Options: reduce animations to 0.5x']},
+{brand:'Redmi',model:'9C',ram:2,dpi:269,fps:30,chip:'Helio G35',display:'IPS 60Hz',tier:'Low',sens:{general:128,redDot:108,scope2x:92,scope4x:70,awm:38,freeLook:118},tips:['Entry-level — keep graphics at Lowest','Tap fire instead of spray at 30 FPS']},
+{brand:'Redmi',model:'K60 Pro',ram:12,dpi:395,fps:90,chip:'Snapdragon 8 Gen 2',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:184,redDot:158,scope2x:136,scope4x:106,awm:70,freeLook:174},tips:['Flagship chip — always 90 FPS mode','SD 8 Gen 2 handles max graphics']},
+{brand:'Redmi',model:'K50i',ram:6,dpi:395,fps:60,chip:'Dimensity 8100',display:'AMOLED 144Hz',tier:'High',sens:{general:168,redDot:144,scope2x:124,scope4x:96,awm:60,freeLook:158},tips:['Dimensity 8100 near flagship','144Hz display — push to 90 FPS in-game']},
+{brand:'Redmi',model:'K40',ram:8,dpi:395,fps:90,chip:'Snapdragon 870',display:'AMOLED 144Hz',tier:'Flagship',sens:{general:178,redDot:152,scope2x:132,scope4x:102,awm:66,freeLook:168},tips:['SD870 handles max settings','144Hz + 90 FPS = insane reaction speed']},
+{brand:'Redmi',model:'Note 14 Pro Plus 5G',ram:12,dpi:452,fps:90,chip:'Dimensity 9300',display:'AMOLED 144Hz',tier:'Flagship',sens:{general:178,redDot:152,scope2x:132,scope4x:102,awm:66,freeLook:168},tips:['Dimensity 9300 flagship power','144Hz + 90 FPS competitive beast']},
+{brand:'Redmi',model:'A3',ram:4,dpi:269,fps:30,chip:'Helio G36',display:'IPS 90Hz',tier:'Low',sens:{general:128,redDot:108,scope2x:92,scope4x:68,awm:38,freeLook:120},tips:['Budget device — Lowest graphics only','90Hz panel helps touch despite weak chip']},
+{brand:'Redmi',model:'12 5G',ram:4,dpi:395,fps:60,chip:'Snapdragon 4 Gen 2',display:'IPS 90Hz',tier:'Mid',sens:{general:144,redDot:122,scope2x:106,scope4x:80,awm:48,freeLook:136},tips:['SD 4 Gen 2 handles 60 FPS at Medium']},
+{brand:'Redmi',model:'A2+',ram:2,dpi:269,fps:30,chip:'Helio G36',display:'IPS 60Hz',tier:'Low',sens:{general:126,redDot:106,scope2x:90,scope4x:66,awm:36,freeLook:116},tips:['Very entry level — Lowest + 30 FPS','Clear RAM before every match']},
+{brand:'Redmi',model:'Note 7 Pro',ram:4,dpi:403,fps:60,chip:'Snapdragon 675',display:'IPS 60Hz',tier:'Mid',sens:{general:146,redDot:124,scope2x:106,scope4x:80,awm:50,freeLook:138},tips:['SD675 capable for 60 FPS gaming','Classic 2019 Redmi — still works great']},
+{brand:'Redmi',model:'K70 Pro',ram:16,dpi:526,fps:120,chip:'Snapdragon 8 Gen 3',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:162,redDot:138,scope2x:120,scope4x:94,awm:60,freeLook:152},tips:['16GB RAM flagship K series','QHD 526 DPI stunning display','Best K series 2024']},
+
+// ── SAMSUNG (28) ──
+{brand:'Samsung',model:'Galaxy A55',ram:8,dpi:394,fps:60,chip:'Exynos 1480',display:'AMOLED 120Hz',tier:'High',sens:{general:160,redDot:136,scope2x:118,scope4x:90,awm:58,freeLook:150},tips:['Exynos 1480 best Samsung A-series chip','120Hz Super AMOLED excellent for gaming','Disable Bixby and Edge Panels for more RAM']},
+{brand:'Samsung',model:'Galaxy A54',ram:6,dpi:394,fps:60,chip:'Exynos 1380',display:'AMOLED 120Hz',tier:'Mid+',sens:{general:152,redDot:130,scope2x:112,scope4x:86,awm:54,freeLook:142},tips:['Exynos 1380 stable at 60 FPS Medium graphics','One UI Game Booster: High Performance mode']},
+{brand:'Samsung',model:'Galaxy A35',ram:6,dpi:394,fps:60,chip:'Exynos 1380',display:'AMOLED 120Hz',tier:'Mid+',sens:{general:150,redDot:128,scope2x:110,scope4x:84,awm:52,freeLook:140},tips:['Same chip as A54 — identical performance','120Hz AMOLED for tracking moving enemies']},
+{brand:'Samsung',model:'Galaxy A34',ram:6,dpi:394,fps:60,chip:'Dimensity 1080',display:'AMOLED 120Hz',tier:'Mid',sens:{general:150,redDot:128,scope2x:110,scope4x:84,awm:52,freeLook:140},tips:['Dimensity 1080 handles 60 FPS very well','Good steady frame rate for competitive play']},
+{brand:'Samsung',model:'Galaxy A25',ram:8,dpi:394,fps:60,chip:'Exynos 1280',display:'AMOLED 120Hz',tier:'Mid',sens:{general:148,redDot:126,scope2x:108,scope4x:82,awm:52,freeLook:138},tips:['Good budget gaming phone','120Hz AMOLED is a plus at this price']},
+{brand:'Samsung',model:'Galaxy A15',ram:4,dpi:270,fps:60,chip:'Helio G99',display:'AMOLED 90Hz',tier:'Mid',sens:{general:142,redDot:120,scope2x:104,scope4x:78,awm:48,freeLook:134},tips:['Helio G99 surprisingly powerful for budget','AMOLED gives good visibility']},
+{brand:'Samsung',model:'Galaxy A14',ram:4,dpi:270,fps:30,chip:'Exynos 850',display:'IPS 60Hz',tier:'Low-Mid',sens:{general:134,redDot:114,scope2x:98,scope4x:74,awm:44,freeLook:126},tips:['Exynos 850 entry-level — stick to 30 FPS','Disable Samsung bloatware for better RAM']},
+{brand:'Samsung',model:'Galaxy A53',ram:6,dpi:394,fps:60,chip:'Exynos 1280',display:'AMOLED 120Hz',tier:'Mid',sens:{general:148,redDot:126,scope2x:108,scope4x:82,awm:52,freeLook:138},tips:['120Hz OIS display reduces blur while aiming','Game Booster: High Performance mode']},
+{brand:'Samsung',model:'Galaxy A52s',ram:6,dpi:394,fps:60,chip:'Snapdragon 778G',display:'AMOLED 120Hz',tier:'High',sens:{general:160,redDot:136,scope2x:118,scope4x:90,awm:58,freeLook:150},tips:['SD778G gaming chip best A52 variant','120Hz AMOLED excellent tracking']},
+{brand:'Samsung',model:'Galaxy M55',ram:8,dpi:394,fps:60,chip:'Snapdragon 7 Gen 1',display:'AMOLED 120Hz',tier:'High',sens:{general:162,redDot:138,scope2x:120,scope4x:92,awm:58,freeLook:152},tips:['Snapdragon 7 Gen 1 excellent gaming chip','Great value gaming phone']},
+{brand:'Samsung',model:'Galaxy M35',ram:6,dpi:394,fps:60,chip:'Exynos 1380',display:'AMOLED 120Hz',tier:'Mid+',sens:{general:154,redDot:132,scope2x:114,scope4x:86,awm:54,freeLook:144},tips:['Same Exynos 1380 as A54 — good stable performance','6000mAh for long gaming sessions']},
+{brand:'Samsung',model:'Galaxy M34',ram:6,dpi:394,fps:60,chip:'Exynos 1280',display:'AMOLED 120Hz',tier:'Mid',sens:{general:150,redDot:128,scope2x:110,scope4x:84,awm:52,freeLook:140},tips:['120Hz AMOLED great for spotting enemies','Medium graphics recommended for stable FPS']},
+{brand:'Samsung',model:'Galaxy M32',ram:4,dpi:268,fps:60,chip:'Helio G85',display:'AMOLED 90Hz',tier:'Mid',sens:{general:140,redDot:118,scope2x:102,scope4x:76,awm:46,freeLook:132},tips:['Helio G85 handles 60 FPS at Low-Medium','AMOLED panel better dark zone visibility']},
+{brand:'Samsung',model:'Galaxy F55',ram:8,dpi:394,fps:60,chip:'Snapdragon 7 Gen 1',display:'AMOLED 120Hz',tier:'High',sens:{general:162,redDot:138,scope2x:120,scope4x:92,awm:58,freeLook:152},tips:['SD 7 Gen 1 excellent gaming chip','Great mid-premium gaming phone']},
+{brand:'Samsung',model:'Galaxy S24 FE',ram:8,dpi:394,fps:90,chip:'Exynos 2500',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:180,redDot:154,scope2x:134,scope4x:104,awm:68,freeLook:170},tips:['Latest flagship FE — always 90 FPS mode','Exynos 2500 top-tier gaming chip']},
+{brand:'Samsung',model:'Galaxy S23 FE',ram:8,dpi:394,fps:90,chip:'Exynos 2200',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:176,redDot:150,scope2x:130,scope4x:100,awm:66,freeLook:166},tips:['Exynos 2200 Xclipse GPU handles max graphics','90 FPS mode very stable']},
+{brand:'Samsung',model:'Galaxy S22 Ultra',ram:12,dpi:500,fps:120,chip:'Snapdragon 8 Gen 1',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:152,redDot:130,scope2x:112,scope4x:86,awm:54,freeLook:142},tips:['Ultra flagship with S Pen','12GB RAM multitasking king','500 DPI QHD display stunning']},
+{brand:'Samsung',model:'Galaxy S23 Ultra',ram:12,dpi:500,fps:120,chip:'Snapdragon 8 Gen 2',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:154,redDot:132,scope2x:114,scope4x:88,awm:56,freeLook:144},tips:['Ultra flagship S Pen gaming','12GB RAM zero lag','Best Samsung for competitive FF']},
+{brand:'Samsung',model:'Galaxy S24',ram:8,dpi:416,fps:120,chip:'Snapdragon 8 Gen 3',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:158,redDot:136,scope2x:118,scope4x:92,awm:60,freeLook:148},tips:['SD 8 Gen 3 latest flagship','120Hz adaptive AMOLED smooth','Compact gaming powerhouse']},
+{brand:'Samsung',model:'Galaxy S25',ram:12,dpi:416,fps:120,chip:'Snapdragon 8 Elite',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:162,redDot:138,scope2x:120,scope4x:94,awm:62,freeLook:152},tips:['SD 8 Elite next-gen chip','12GB RAM standard now','Compact flagship perfection']},
+{brand:'Samsung',model:'Galaxy S25 Ultra',ram:12,dpi:505,fps:120,chip:'Snapdragon 8 Elite',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:158,redDot:136,scope2x:118,scope4x:92,awm:60,freeLook:148},tips:['Ultra flagship SD 8 Elite','Best Samsung gaming phone 2025']},
+{brand:'Samsung',model:'Galaxy A73',ram:8,dpi:390,fps:60,chip:'Snapdragon 778G',display:'AMOLED 120Hz',tier:'High',sens:{general:164,redDot:140,scope2x:122,scope4x:94,awm:60,freeLook:154},tips:['SD778G excellent gaming chip','120Hz OIS AMOLED smooth aim tracking']},
+{brand:'Samsung',model:'Galaxy A03s',ram:3,dpi:269,fps:30,chip:'Helio P35',display:'IPS 60Hz',tier:'Low',sens:{general:128,redDot:108,scope2x:92,scope4x:68,awm:38,freeLook:120},tips:['Entry level — Lowest graphics + 30 FPS only','Clear RAM before every match']},
+{brand:'Samsung',model:'Galaxy A05s',ram:4,dpi:270,fps:60,chip:'Snapdragon 680',display:'IPS 90Hz',tier:'Mid',sens:{general:140,redDot:118,scope2x:102,scope4x:76,awm:46,freeLook:132},tips:['SD680 very efficient — stays cool during gaming','Stable 60 FPS at Low-Medium graphics']},
+{brand:'Samsung',model:'Galaxy F15',ram:4,dpi:270,fps:60,chip:'Helio G85',display:'AMOLED 90Hz',tier:'Mid',sens:{general:140,redDot:118,scope2x:102,scope4x:76,awm:46,freeLook:132},tips:['Helio G85 AMOLED combo decent for 60 FPS','90Hz display helps with touch accuracy']},
+{brand:'Samsung',model:'Galaxy M13',ram:4,dpi:268,fps:60,chip:'Exynos 850',display:'IPS 60Hz',tier:'Low-Mid',sens:{general:132,redDot:112,scope2x:96,scope4x:72,awm:42,freeLook:124},tips:['Stick to Low graphics for stable FPS','Close Samsung Music, Edge Panels before gaming']},
+{brand:'Samsung',model:'Galaxy A32',ram:4,dpi:394,fps:60,chip:'Helio G80',display:'AMOLED 90Hz',tier:'Mid',sens:{general:144,redDot:122,scope2x:106,scope4x:80,awm:50,freeLook:136},tips:['AMOLED 90Hz mid-ranger','Helio G80 handles 60 FPS at Medium']},
+{brand:'Samsung',model:'Galaxy A22',ram:4,dpi:400,fps:60,chip:'Helio G80',display:'AMOLED 90Hz',tier:'Mid',sens:{general:146,redDot:124,scope2x:108,scope4x:82,awm:52,freeLook:138},tips:['Good budget AMOLED gaming','90Hz smooth touch response for aiming']},
+
+// ── REALME (22) ──
+{brand:'Realme',model:'13 Pro+',ram:8,dpi:452,fps:90,chip:'Snapdragon 7s Gen 3',display:'AMOLED 120Hz',tier:'High',sens:{general:170,redDot:146,scope2x:126,scope4x:98,awm:62,freeLook:160},tips:['SD 7s Gen 3 smooth at 90 FPS','Curved AMOLED — slight sens reduction helps']},
+{brand:'Realme',model:'13 Pro',ram:8,dpi:394,fps:60,chip:'Snapdragon 7s Gen 2',display:'AMOLED 120Hz',tier:'High',sens:{general:164,redDot:140,scope2x:122,scope4x:92,awm:58,freeLook:154},tips:['SD 7s Gen 2 handles 60 FPS excellently','Great AMOLED display for spotting enemies']},
+{brand:'Realme',model:'12 Pro+',ram:8,dpi:452,fps:60,chip:'Snapdragon 7s Gen 2',display:'AMOLED 120Hz',tier:'High',sens:{general:162,redDot:138,scope2x:120,scope4x:92,awm:58,freeLook:152},tips:['120Hz curved AMOLED smooth aim tracking','High DPI: these values give best accuracy']},
+{brand:'Realme',model:'12 Pro',ram:8,dpi:394,fps:60,chip:'Snapdragon 6 Gen 1',display:'AMOLED 120Hz',tier:'Mid+',sens:{general:158,redDot:136,scope2x:116,scope4x:88,awm:56,freeLook:148},tips:['SD 6 Gen 1 excellent power efficiency','60 FPS very stable at Medium-High graphics']},
+{brand:'Realme',model:'C67',ram:6,dpi:400,fps:60,chip:'Snapdragon 685',display:'IPS 90Hz',tier:'Mid',sens:{general:148,redDot:126,scope2x:108,scope4x:82,awm:52,freeLook:138},tips:['SD685 very stable at 60 FPS','90Hz adds touch responsiveness edge']},
+{brand:'Realme',model:'C55',ram:6,dpi:403,fps:60,chip:'Helio G88',display:'IPS 90Hz',tier:'Mid',sens:{general:146,redDot:124,scope2x:106,scope4x:80,awm:50,freeLook:136},tips:['Good budget option — Medium graphics','90Hz display gives better touch response']},
+{brand:'Realme',model:'C53',ram:4,dpi:269,fps:60,chip:'Snapdragon 680',display:'IPS 90Hz',tier:'Mid',sens:{general:140,redDot:118,scope2x:102,scope4x:76,awm:46,freeLook:132},tips:['SD680 stable at 60 FPS Low-Medium','90Hz smoother for aiming']},
+{brand:'Realme',model:'C35',ram:4,dpi:270,fps:60,chip:'Unisoc T616',display:'IPS 60Hz',tier:'Low-Mid',sens:{general:132,redDot:112,scope2x:96,scope4x:72,awm:42,freeLook:124},tips:['Unisoc T616 — Low graphics for stable gameplay','60 FPS may need Low to stay stable']},
+{brand:'Realme',model:'Narzo 70 Pro',ram:8,dpi:402,fps:90,chip:'Dimensity 7050',display:'AMOLED 120Hz',tier:'High',sens:{general:166,redDot:142,scope2x:124,scope4x:94,awm:60,freeLook:156},tips:['Dimensity 7050 very capable at 90 FPS','AMOLED dark zone advantage']},
+{brand:'Realme',model:'Narzo 60 Pro',ram:8,dpi:394,fps:60,chip:'Dimensity 7050',display:'AMOLED 120Hz',tier:'High',sens:{general:162,redDot:138,scope2x:120,scope4x:92,awm:58,freeLook:152},tips:['Dimensity 7050 handles 60 FPS at High','AMOLED 120Hz excellent for competitive play']},
+{brand:'Realme',model:'Narzo 50',ram:4,dpi:395,fps:60,chip:'Helio G96',display:'IPS 120Hz',tier:'Mid',sens:{general:144,redDot:122,scope2x:104,scope4x:78,awm:48,freeLook:136},tips:['Helio G96 solid for 60 FPS gaming','120Hz panel gives responsive touch']},
+{brand:'Realme',model:'GT Neo 5',ram:8,dpi:397,fps:90,chip:'Snapdragon 8+ Gen 1',display:'AMOLED 144Hz',tier:'Flagship',sens:{general:184,redDot:158,scope2x:136,scope4x:106,awm:70,freeLook:174},tips:['Near-flagship SD 8+ Gen 1','144Hz AMOLED + 90 FPS = insane smooth']},
+{brand:'Realme',model:'GT Neo 3',ram:8,dpi:397,fps:90,chip:'Dimensity 8100',display:'AMOLED 120Hz',tier:'High',sens:{general:170,redDot:146,scope2x:126,scope4x:98,awm:62,freeLook:160},tips:['Flagship Dimensity chip — use 90 FPS always','Best Realme for Free Fire under 30K']},
+{brand:'Realme',model:'GT 2',ram:8,dpi:397,fps:90,chip:'Snapdragon 888',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:182,redDot:156,scope2x:134,scope4x:104,awm:68,freeLook:172},tips:['SD888 flagship — max settings no problem','90 FPS + SD888 = competitive advantage']},
+{brand:'Realme',model:'10 Pro+',ram:8,dpi:397,fps:60,chip:'Dimensity 1080',display:'AMOLED 120Hz',tier:'High',sens:{general:162,redDot:138,scope2x:120,scope4x:92,awm:58,freeLook:152},tips:['120Hz curved AMOLED excellent touch accuracy','Dimensity 1080 handles all settings well']},
+{brand:'Realme',model:'9 Pro+',ram:6,dpi:395,fps:60,chip:'Dimensity 920',display:'AMOLED 90Hz',tier:'Mid+',sens:{general:156,redDot:134,scope2x:116,scope4x:88,awm:56,freeLook:146},tips:['Dimensity 920 handles 60 FPS very smoothly','AMOLED display great visibility']},
+{brand:'Realme',model:'9i',ram:4,dpi:269,fps:60,chip:'Snapdragon 680',display:'IPS 90Hz',tier:'Mid',sens:{general:142,redDot:120,scope2x:104,scope4x:78,awm:48,freeLook:134},tips:['SD680 very efficient — stays cool','90Hz IPS smooth touch response']},
+{brand:'Realme',model:'8 Pro',ram:6,dpi:394,fps:60,chip:'Snapdragon 720G',display:'AMOLED 60Hz',tier:'Mid+',sens:{general:152,redDot:130,scope2x:112,scope4x:86,awm:54,freeLook:142},tips:['SD720G gaming chip handles 60 FPS at Medium-High','AMOLED for great color contrast']},
+{brand:'Realme',model:'8',ram:4,dpi:394,fps:60,chip:'Helio G95',display:'AMOLED 60Hz',tier:'Mid',sens:{general:148,redDot:126,scope2x:108,scope4x:82,awm:52,freeLook:138},tips:['Helio G95 stable for 60 FPS gaming','AMOLED + this sensitivity = solid performance']},
+{brand:'Realme',model:'6 Pro',ram:6,dpi:395,fps:60,chip:'Snapdragon 720G',display:'IPS 90Hz',tier:'Mid+',sens:{general:154,redDot:132,scope2x:112,scope4x:86,awm:54,freeLook:144},tips:['SD720G great gaming chip','90Hz smooth for fast aim tracking']},
+{brand:'Realme',model:'C21Y',ram:3,dpi:269,fps:30,chip:'Helio G35',display:'IPS 60Hz',tier:'Low',sens:{general:128,redDot:108,scope2x:92,scope4x:68,awm:38,freeLook:120},tips:['Entry level — Lowest + 30 FPS','Close all apps before Free Fire every time']},
+{brand:'Realme',model:'P4 Pro',ram:12,dpi:395,fps:144,chip:'Dimensity 9200',display:'AMOLED 144Hz',tier:'Flagship',sens:{general:174,redDot:148,scope2x:128,scope4x:98,awm:64,freeLook:164},tips:['Dimensity 9200 flagship power','144Hz AMOLED ultimate smoothness','12GB RAM best P series ever']},
+
+// ── POCO (18) ──
+{brand:'Poco',model:'X6 Pro',ram:8,dpi:452,fps:90,chip:'Dimensity 8300 Ultra',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:178,redDot:152,scope2x:132,scope4x:102,awm:66,freeLook:168},tips:['Dimensity 8300 Ultra near-flagship','90 FPS stable — best POCO for Free Fire 2024']},
+{brand:'Poco',model:'X6',ram:8,dpi:452,fps:60,chip:'Snapdragon 7s Gen 3',display:'AMOLED 120Hz',tier:'High',sens:{general:170,redDot:146,scope2x:126,scope4x:98,awm:62,freeLook:160},tips:['SD 7s Gen 3 great gaming chip','High DPI — these lower values are optimized']},
+{brand:'Poco',model:'X5 Pro',ram:6,dpi:395,fps:60,chip:'Snapdragon 778G',display:'AMOLED 120Hz',tier:'High',sens:{general:164,redDot:140,scope2x:122,scope4x:94,awm:60,freeLook:154},tips:['SD778G gaming powerhouse','120Hz AMOLED gives excellent aiming precision']},
+{brand:'Poco',model:'X5',ram:6,dpi:395,fps:60,chip:'Snapdragon 695',display:'AMOLED 120Hz',tier:'Mid+',sens:{general:156,redDot:134,scope2x:114,scope4x:86,awm:54,freeLook:146},tips:['SD695 handles 60 FPS at Medium-High','Good balanced sensitivity for all-round play']},
+{brand:'Poco',model:'X4 Pro',ram:6,dpi:395,fps:60,chip:'Snapdragon 695',display:'AMOLED 120Hz',tier:'Mid+',sens:{general:156,redDot:134,scope2x:114,scope4x:86,awm:54,freeLook:146},tips:['Same specs as X5 — identical performance','120Hz AMOLED excellent for fast target tracking']},
+{brand:'Poco',model:'M6 Pro',ram:8,dpi:394,fps:60,chip:'Helio G99 Ultra',display:'AMOLED 120Hz',tier:'Mid+',sens:{general:158,redDot:136,scope2x:116,scope4x:88,awm:56,freeLook:148},tips:['Helio G99 Ultra best Helio gaming chip','AMOLED 120Hz great at this price point']},
+{brand:'Poco',model:'M6',ram:4,dpi:269,fps:60,chip:'Helio G91 Ultra',display:'AMOLED 90Hz',tier:'Mid',sens:{general:144,redDot:122,scope2x:104,scope4x:78,awm:48,freeLook:136},tips:['Helio G91 Ultra decent for 60 FPS','AMOLED gives better visibility than IPS']},
+{brand:'Poco',model:'M5s',ram:6,dpi:395,fps:60,chip:'Snapdragon 680',display:'AMOLED 90Hz',tier:'Mid',sens:{general:148,redDot:126,scope2x:108,scope4x:82,awm:52,freeLook:140},tips:['AMOLED + SD680 smooth gaming experience','90Hz helps with quick aim detection']},
+{brand:'Poco',model:'C75',ram:6,dpi:269,fps:60,chip:'Helio G91 Ultra',display:'AMOLED 90Hz',tier:'Mid',sens:{general:144,redDot:122,scope2x:104,scope4x:78,awm:48,freeLook:136},tips:['Latest budget POCO — Helio G91 Ultra solid','AMOLED surprisingly good at this price']},
+{brand:'Poco',model:'C65',ram:4,dpi:269,fps:60,chip:'Helio G85',display:'IPS 90Hz',tier:'Low-Mid',sens:{general:136,redDot:114,scope2x:98,scope4x:74,awm:44,freeLook:128},tips:['Budget phone — Low-Medium graphics','90Hz panel adds responsiveness vs 60Hz']},
+{brand:'Poco',model:'F6',ram:12,dpi:452,fps:90,chip:'Snapdragon 8s Gen 3',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:182,redDot:156,scope2x:136,scope4x:104,awm:68,freeLook:172},tips:['Near-flagship SD 8s Gen 3','Absolute best POCO for Free Fire 2024','90 FPS + 12GB RAM = zero lag guaranteed']},
+{brand:'Poco',model:'F5',ram:8,dpi:395,fps:90,chip:'Snapdragon 7+ Gen 2',display:'AMOLED 120Hz',tier:'High',sens:{general:174,redDot:148,scope2x:128,scope4x:100,awm:64,freeLook:164},tips:['SD 7+ Gen 2 excellent for 90 FPS','120Hz AMOLED competitive advantage']},
+{brand:'Poco',model:'F4',ram:8,dpi:395,fps:90,chip:'Snapdragon 870',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:176,redDot:150,scope2x:130,scope4x:100,awm:66,freeLook:166},tips:['SD870 near-flagship performance','High sensitivity suits blazing-fast gameplay']},
+{brand:'Poco',model:'F3',ram:6,dpi:395,fps:90,chip:'Snapdragon 870',display:'AMOLED 120Hz',tier:'High',sens:{general:174,redDot:148,scope2x:128,scope4x:98,awm:64,freeLook:164},tips:['Same SD870 chip as F4 — identical gaming','Great for 90 FPS rush gameplay']},
+{brand:'Poco',model:'X3 Pro',ram:6,dpi:395,fps:60,chip:'Snapdragon 860',display:'IPS 120Hz',tier:'High',sens:{general:162,redDot:138,scope2x:120,scope4x:92,awm:58,freeLook:152},tips:['SD860 still excellent for 60 FPS','120Hz IPS fast touch response']},
+{brand:'Poco',model:'X3',ram:6,dpi:395,fps:60,chip:'Snapdragon 732G',display:'IPS 120Hz',tier:'High',sens:{general:160,redDot:136,scope2x:118,scope4x:90,awm:58,freeLook:150},tips:['SD732G gaming chip solid','120Hz IPS smooth panel']},
+{brand:'Poco',model:'M4 Pro',ram:4,dpi:395,fps:60,chip:'Dimensity 810',display:'AMOLED 90Hz',tier:'Mid',sens:{general:146,redDot:124,scope2x:106,scope4x:80,awm:50,freeLook:136},tips:['Dimensity 810 handles 60 FPS at Medium','AMOLED competitive edge in dark zones']},
+{brand:'Poco',model:'C55',ram:6,dpi:269,fps:60,chip:'Helio G85',display:'IPS 90Hz',tier:'Mid',sens:{general:140,redDot:118,scope2x:102,scope4x:76,awm:46,freeLook:132},tips:['Helio G85 stable at 60 FPS Medium','Close background apps for consistent FPS']},
+
+// ── OPPO (14) ──
+{brand:'OPPO',model:'Reno 12 Pro',ram:12,dpi:452,fps:90,chip:'Dimensity 7300 Energy',display:'AMOLED 120Hz',tier:'High',sens:{general:172,redDot:148,scope2x:128,scope4x:98,awm:62,freeLook:162},tips:['Latest 2024 Reno — excellent for gaming','90 FPS stable on Dimensity 7300']},
+{brand:'OPPO',model:'Reno 12',ram:8,dpi:394,fps:60,chip:'Dimensity 7050',display:'AMOLED 120Hz',tier:'High',sens:{general:164,redDot:140,scope2x:122,scope4x:92,awm:58,freeLook:154},tips:['Dimensity 7050 handles 60 FPS at Medium-High','AMOLED 120Hz excellent visibility']},
+{brand:'OPPO',model:'Reno 11 Pro',ram:12,dpi:452,fps:90,chip:'Dimensity 8200',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:178,redDot:152,scope2x:132,scope4x:102,awm:66,freeLook:168},tips:['Dimensity 8200 near-flagship gaming chip','90 FPS smooth and stable']},
+{brand:'OPPO',model:'Reno 11',ram:8,dpi:394,fps:60,chip:'Dimensity 6080',display:'AMOLED 120Hz',tier:'Mid+',sens:{general:158,redDot:136,scope2x:116,scope4x:88,awm:56,freeLook:148},tips:['Dimensity 6080 handles 60 FPS at Medium','Good AMOLED display for dark zone fights']},
+{brand:'OPPO',model:'Reno 10 Pro+',ram:12,dpi:452,fps:90,chip:'Snapdragon 8+ Gen 1',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:184,redDot:158,scope2x:136,scope4x:106,awm:70,freeLook:174},tips:['Flagship SD 8+ Gen 1 — max settings always','90 FPS zero lag guaranteed']},
+{brand:'OPPO',model:'Reno 10',ram:8,dpi:394,fps:60,chip:'Snapdragon 778G',display:'AMOLED 120Hz',tier:'High',sens:{general:166,redDot:142,scope2x:124,scope4x:94,awm:60,freeLook:156},tips:['SD778G excellent gaming performance','AMOLED 120Hz competitive advantage']},
+{brand:'OPPO',model:'A79',ram:8,dpi:391,fps:60,chip:'Dimensity 6020',display:'AMOLED 90Hz',tier:'Mid',sens:{general:150,redDot:128,scope2x:110,scope4x:84,awm:52,freeLook:140},tips:['Dimensity 6020 handles 60 FPS at Low-Medium','AMOLED display visibility edge']},
+{brand:'OPPO',model:'A78',ram:8,dpi:391,fps:60,chip:'Snapdragon 695',display:'AMOLED 90Hz',tier:'Mid+',sens:{general:156,redDot:134,scope2x:114,scope4x:86,awm:54,freeLook:146},tips:['SD695 great gaming chip','AMOLED + Game Space = competitive advantage']},
+{brand:'OPPO',model:'A58',ram:8,dpi:391,fps:60,chip:'Helio G85',display:'AMOLED 90Hz',tier:'Mid',sens:{general:146,redDot:124,scope2x:106,scope4x:80,awm:50,freeLook:138},tips:['AMOLED gives edge in visibility','Helio G85 at Low-Medium for stable 60 FPS']},
+{brand:'OPPO',model:'A38',ram:4,dpi:269,fps:30,chip:'Helio G85',display:'IPS 60Hz',tier:'Low-Mid',sens:{general:132,redDot:112,scope2x:96,scope4x:72,awm:42,freeLook:124},tips:['30 FPS recommended for stable gameplay','Set graphics to Low and shadows off']},
+{brand:'OPPO',model:'A18',ram:4,dpi:269,fps:60,chip:'Helio G85',display:'IPS 90Hz',tier:'Low-Mid',sens:{general:136,redDot:114,scope2x:98,scope4x:74,awm:44,freeLook:128},tips:['Entry-level OPPO — Low graphics','90Hz panel helps with touch response']},
+{brand:'OPPO',model:'F25 Pro',ram:8,dpi:402,fps:90,chip:'Dimensity 7050',display:'AMOLED 120Hz',tier:'High',sens:{general:166,redDot:142,scope2x:124,scope4x:94,awm:60,freeLook:156},tips:['Latest OPPO F series — excellent gaming','90 FPS stable on Dimensity 7050']},
+{brand:'OPPO',model:'Find X8 Pro',ram:16,dpi:522,fps:120,chip:'Dimensity 9400',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:164,redDot:140,scope2x:122,scope4x:96,awm:62,freeLook:154},tips:['X8 Pro ultra flagship — 16GB RAM beast','Best Oppo gaming 2024']},
+{brand:'OPPO',model:'A3 Pro',ram:8,dpi:394,fps:60,chip:'Dimensity 6300',display:'AMOLED 120Hz',tier:'Mid+',sens:{general:154,redDot:132,scope2x:114,scope4x:86,awm:54,freeLook:144},tips:['Latest 2024 budget OPPO','Dimensity 6300 stable at 60 FPS Medium']},
+
+// ── VIVO (15) ──
+{brand:'Vivo',model:'T3x',ram:8,dpi:394,fps:60,chip:'Snapdragon 6 Gen 1',display:'AMOLED 120Hz',tier:'High',sens:{general:160,redDot:136,scope2x:118,scope4x:90,awm:58,freeLook:150},tips:['Latest 2024 Vivo T series — great gaming','SD 6 Gen 1 very efficient and powerful']},
+{brand:'Vivo',model:'T3 Pro',ram:8,dpi:394,fps:90,chip:'Snapdragon 7 Gen 3',display:'AMOLED 144Hz',tier:'High',sens:{general:174,redDot:148,scope2x:128,scope4x:98,awm:62,freeLook:164},tips:['SD 7 Gen 3 best Vivo T3 gaming chip','144Hz AMOLED + 90 FPS exceptional']},
+{brand:'Vivo',model:'T2 Pro',ram:8,dpi:394,fps:60,chip:'Dimensity 7200',display:'AMOLED 120Hz',tier:'High',sens:{general:164,redDot:140,scope2x:122,scope4x:92,awm:58,freeLook:154},tips:['Dimensity 7200 excellent for 60 FPS','120Hz AMOLED great for spotting enemies']},
+{brand:'Vivo',model:'V30 Pro',ram:12,dpi:452,fps:60,chip:'Snapdragon 7 Gen 3',display:'AMOLED 120Hz',tier:'High',sens:{general:170,redDot:144,scope2x:126,scope4x:96,awm:62,freeLook:160},tips:['SD 7 Gen 3 flagship-class gaming','12GB RAM means no background interference']},
+{brand:'Vivo',model:'V30e',ram:8,dpi:394,fps:60,chip:'Snapdragon 6 Gen 1',display:'AMOLED 120Hz',tier:'Mid+',sens:{general:158,redDot:136,scope2x:116,scope4x:88,awm:56,freeLook:148},tips:['SD 6 Gen 1 handles 60 FPS at Medium-High','Slim design — grip properly to avoid accidental inputs']},
+{brand:'Vivo',model:'Y200 Pro',ram:8,dpi:394,fps:60,chip:'Snapdragon 695',display:'AMOLED 120Hz',tier:'Mid+',sens:{general:156,redDot:134,scope2x:114,scope4x:86,awm:54,freeLook:146},tips:['SD695 stable 60 FPS gaming','120Hz AMOLED competitive advantage']},
+{brand:'Vivo',model:'Y200',ram:8,dpi:394,fps:60,chip:'Snapdragon 4 Gen 2',display:'AMOLED 120Hz',tier:'Mid',sens:{general:152,redDot:130,scope2x:112,scope4x:86,awm:54,freeLook:142},tips:['SD 4 Gen 2 efficient for 60 FPS','AMOLED 120Hz great display for the price']},
+{brand:'Vivo',model:'Y100',ram:8,dpi:393,fps:60,chip:'Snapdragon 695',display:'AMOLED 120Hz',tier:'Mid+',sens:{general:156,redDot:134,scope2x:114,scope4x:86,awm:54,freeLook:146},tips:['AMOLED + SD695 great combo','Enable Vivo Origin OS game mode before playing']},
+{brand:'Vivo',model:'Y58',ram:8,dpi:393,fps:60,chip:'Dimensity 6300',display:'AMOLED 90Hz',tier:'Mid',sens:{general:148,redDot:126,scope2x:108,scope4x:82,awm:52,freeLook:140},tips:['Dimensity 6300 stable 60 FPS','Good battery for long gaming sessions']},
+{brand:'Vivo',model:'Y27s',ram:6,dpi:270,fps:60,chip:'Snapdragon 680',display:'AMOLED 90Hz',tier:'Mid',sens:{general:144,redDot:122,scope2x:104,scope4x:78,awm:48,freeLook:136},tips:['SD680 stable and cool-running','AMOLED display gives dark zone advantage']},
+{brand:'Vivo',model:'Y17s',ram:4,dpi:269,fps:60,chip:'Helio G85',display:'IPS 90Hz',tier:'Low-Mid',sens:{general:136,redDot:114,scope2x:98,scope4x:74,awm:44,freeLook:128},tips:['Budget phone — Low graphics stable at 60 FPS','90Hz helps with touch accuracy']},
+{brand:'Vivo',model:'Y16',ram:4,dpi:269,fps:30,chip:'Helio P35',display:'IPS 60Hz',tier:'Low',sens:{general:128,redDot:108,scope2x:92,scope4x:68,awm:38,freeLook:120},tips:['Entry level — 30 FPS Lowest settings','Clear all RAM before gaming']},
+{brand:'Vivo',model:'V27 Pro',ram:8,dpi:394,fps:60,chip:'Dimensity 8200',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:170,redDot:146,scope2x:126,scope4x:98,awm:62,freeLook:160},tips:['Dimensity 8200 near-flagship gaming','Great all-round competitive sensitivity']},
+{brand:'Vivo',model:'X90',ram:12,dpi:452,fps:90,chip:'Dimensity 9200',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:180,redDot:154,scope2x:134,scope4x:104,awm:68,freeLook:170},tips:['Dimensity 9200 full flagship chip','90 FPS at max graphics — zero compromise']},
+{brand:'Vivo',model:'Y75',ram:8,dpi:393,fps:60,chip:'Dimensity 810',display:'AMOLED 90Hz',tier:'Mid',sens:{general:148,redDot:126,scope2x:108,scope4x:82,awm:52,freeLook:140},tips:['Dimensity 810 stable 60 FPS','AMOLED gives competitive visibility']},
+
+// ── ONEPLUS (12) ──
+{brand:'OnePlus',model:'13',ram:16,dpi:525,fps:120,chip:'Snapdragon 8 Elite',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:162,redDot:138,scope2x:120,scope4x:94,awm:60,freeLook:152},tips:['SD 8 Elite flagship 2025','16GB RAM beast','Best OnePlus gaming phone']},
+{brand:'OnePlus',model:'12',ram:16,dpi:510,fps:120,chip:'Snapdragon 8 Gen 3',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:160,redDot:136,scope2x:118,scope4x:92,awm:58,freeLook:150},tips:['2024 flagship phone','16GB RAM ultimate','QHD display stunning']},
+{brand:'OnePlus',model:'Nord CE4',ram:8,dpi:394,fps:60,chip:'Snapdragon 7 Gen 3',display:'AMOLED 120Hz',tier:'High',sens:{general:168,redDot:144,scope2x:124,scope4x:96,awm:60,freeLook:158},tips:['Latest 2024 Nord — SD 7 Gen 3 excellent','OxygenOS Game Mode: enable CPU+GPU boost']},
+{brand:'OnePlus',model:'Nord CE4 Lite',ram:8,dpi:401,fps:60,chip:'Snapdragon 695',display:'IPS 120Hz',tier:'Mid+',sens:{general:156,redDot:134,scope2x:114,scope4x:86,awm:54,freeLook:146},tips:['SD695 stable 60 FPS gaming','120Hz IPS responsive panel for aiming']},
+{brand:'OnePlus',model:'Nord CE3',ram:8,dpi:394,fps:60,chip:'Snapdragon 782G',display:'AMOLED 120Hz',tier:'High',sens:{general:166,redDot:142,scope2x:124,scope4x:94,awm:60,freeLook:156},tips:['SD782G near-flagship performance','AMOLED 120Hz = best Nord CE display']},
+{brand:'OnePlus',model:'Nord 3',ram:8,dpi:394,fps:90,chip:'Dimensity 9000',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:180,redDot:154,scope2x:134,scope4x:104,awm:68,freeLook:170},tips:['Dimensity 9000 flagship chip in Nord!','90 FPS guaranteed smooth at all settings']},
+{brand:'OnePlus',model:'Nord 2T',ram:8,dpi:394,fps:90,chip:'Dimensity 1300',display:'AMOLED 120Hz',tier:'High',sens:{general:172,redDot:146,scope2x:128,scope4x:98,awm:62,freeLook:162},tips:['90 FPS stable on Dimensity 1300','OxygenOS Game Mode: enable CPU+GPU boost']},
+{brand:'OnePlus',model:'12R',ram:8,dpi:394,fps:90,chip:'Snapdragon 8 Gen 1',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:182,redDot:156,scope2x:134,scope4x:104,awm:68,freeLook:172},tips:['SD 8 Gen 1 flagship — max everything','90 FPS with flagship chip = ultimate experience']},
+{brand:'OnePlus',model:'10R',ram:12,dpi:397,fps:90,chip:'Dimensity 8100 Max',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:180,redDot:154,scope2x:134,scope4x:104,awm:68,freeLook:170},tips:['Dimensity 8100 Max near-flagship','12GB RAM = zero background interference']},
+{brand:'OnePlus',model:'10 Pro',ram:12,dpi:525,fps:90,chip:'Snapdragon 8 Gen 1',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:176,redDot:150,scope2x:130,scope4x:100,awm:64,freeLook:166},tips:['525 DPI curved QHD AMOLED','Flagship SD 8 Gen 1 at max settings always']},
+{brand:'OnePlus',model:'9R',ram:8,dpi:402,fps:90,chip:'Snapdragon 870',display:'AMOLED 90Hz',tier:'Flagship',sens:{general:176,redDot:150,scope2x:130,scope4x:100,awm:66,freeLook:166},tips:['SD870 near-flagship — 90 FPS stable','90Hz AMOLED + high sensitivity = deadly']},
+{brand:'OnePlus',model:'Nord',ram:6,dpi:408,fps:60,chip:'Snapdragon 765G',display:'AMOLED 90Hz',tier:'High',sens:{general:158,redDot:136,scope2x:116,scope4x:88,awm:56,freeLook:148},tips:['SD765G 5G chip — good gaming','90Hz AMOLED competitive advantage']},
+
+// ── IPHONE (12) ──
+{brand:'iPhone',model:'16 Pro Max',ram:8,dpi:460,fps:120,chip:'A18 Pro',display:'OLED ProMotion 120Hz',tier:'Flagship',sens:{general:150,redDot:128,scope2x:110,scope4x:84,awm:54,freeLook:140},tips:['A18 Pro fastest mobile chip','ProMotion 120Hz ultimate smoothness','Best iPhone for competitive FF']},
+{brand:'iPhone',model:'16 Pro',ram:8,dpi:460,fps:120,chip:'A18 Pro',display:'OLED ProMotion 120Hz',tier:'Flagship',sens:{general:150,redDot:128,scope2x:110,scope4x:84,awm:54,freeLook:140},tips:['A18 Pro flagship gaming','ProMotion 120Hz smooth competitive']},
+{brand:'iPhone',model:'16',ram:8,dpi:460,fps:120,chip:'A18',display:'OLED 120Hz',tier:'Flagship',sens:{general:148,redDot:126,scope2x:108,scope4x:82,awm:52,freeLook:138},tips:['A18 chip ultimate performance','120Hz ProMotion buttery smooth']},
+{brand:'iPhone',model:'15 Pro',ram:8,dpi:460,fps:60,chip:'A17 Pro',display:'OLED ProMotion 120Hz',tier:'Flagship',sens:{general:148,redDot:126,scope2x:108,scope4x:82,awm:52,freeLook:138},tips:["A17 Pro = world's fastest chip (2023)",'ProMotion 120Hz + iOS buttery smooth']},
+{brand:'iPhone',model:'15',ram:6,dpi:460,fps:60,chip:'A16 Bionic',display:'OLED 60Hz',tier:'Flagship',sens:{general:144,redDot:124,scope2x:106,scope4x:80,awm:50,freeLook:134},tips:['A16 Bionic handles max settings easily','High DPI retina: lower sensitivity for precision']},
+{brand:'iPhone',model:'14 Pro',ram:6,dpi:460,fps:60,chip:'A16 Bionic',display:'OLED ProMotion 120Hz',tier:'Flagship',sens:{general:148,redDot:126,scope2x:108,scope4x:82,awm:52,freeLook:138},tips:['ProMotion 120Hz = smooth tracking','A16 handles max graphics effortlessly']},
+{brand:'iPhone',model:'14',ram:6,dpi:460,fps:60,chip:'A15 Bionic',display:'OLED 60Hz',tier:'Flagship',sens:{general:144,redDot:124,scope2x:106,scope4x:80,awm:50,freeLook:134},tips:['A15 Bionic top-tier gaming performance','Lower sens compensates for high DPI']},
+{brand:'iPhone',model:'13 Pro',ram:6,dpi:460,fps:60,chip:'A15 Bionic',display:'OLED ProMotion 120Hz',tier:'Flagship',sens:{general:150,redDot:128,scope2x:110,scope4x:84,awm:54,freeLook:140},tips:['ProMotion 120Hz much smoother for aiming','A15 Bionic handles max graphics on iOS']},
+{brand:'iPhone',model:'13',ram:4,dpi:460,fps:60,chip:'A15 Bionic',display:'OLED 60Hz',tier:'Flagship',sens:{general:146,redDot:126,scope2x:108,scope4x:82,awm:52,freeLook:138},tips:['A15 Bionic very powerful for gaming','iOS 60 FPS consistency gives competitive edge']},
+{brand:'iPhone',model:'12',ram:4,dpi:460,fps:60,chip:'A14 Bionic',display:'OLED 60Hz',tier:'Flagship',sens:{general:142,redDot:122,scope2x:104,scope4x:78,awm:48,freeLook:134},tips:['A14 Bionic iOS gaming very smooth','Lower sensitivity for high DPI precision']},
+{brand:'iPhone',model:'11',ram:4,dpi:326,fps:60,chip:'A13 Bionic',display:'LCD 60Hz',tier:'High',sens:{general:158,redDot:136,scope2x:116,scope4x:88,awm:56,freeLook:148},tips:['LCD 326 DPI — slightly higher sens works well','A13 Bionic still very capable for Free Fire']},
+{brand:'iPhone',model:'SE 2022',ram:4,dpi:326,fps:60,chip:'A15 Bionic',display:'LCD 60Hz',tier:'High',sens:{general:158,redDot:136,scope2x:116,scope4x:88,awm:56,freeLook:148},tips:['A15 in tiny body — insane gaming power','Small 4.7" screen — high sens for quick flicks']},
+
+// ── MOTOROLA (10) ──
+{brand:'Motorola',model:'Edge 50 Fusion',ram:8,dpi:394,fps:60,chip:'Snapdragon 7s Gen 2',display:'AMOLED 144Hz',tier:'High',sens:{general:166,redDot:142,scope2x:124,scope4x:94,awm:60,freeLook:156},tips:['144Hz AMOLED — one of best displays for gaming','SD 7s Gen 2 handles 60 FPS smoothly']},
+{brand:'Motorola',model:'Edge 50 Pro',ram:12,dpi:452,fps:90,chip:'Snapdragon 7 Gen 3',display:'AMOLED 144Hz',tier:'High',sens:{general:174,redDot:148,scope2x:128,scope4x:100,awm:64,freeLook:164},tips:['144Hz AMOLED + 90 FPS stunning gaming','SD 7 Gen 3 handles any Free Fire settings']},
+{brand:'Motorola',model:'G85',ram:8,dpi:394,fps:60,chip:'Snapdragon 6s Gen 3',display:'AMOLED 120Hz',tier:'High',sens:{general:160,redDot:136,scope2x:118,scope4x:90,awm:58,freeLook:150},tips:['Latest Moto G85 — great value gaming','120Hz AMOLED good for aim tracking']},
+{brand:'Motorola',model:'G64',ram:8,dpi:394,fps:60,chip:'Dimensity 7025',display:'IPS 120Hz',tier:'Mid',sens:{general:152,redDot:130,scope2x:112,scope4x:86,awm:54,freeLook:142},tips:['Dimensity 7025 handles 60 FPS well','120Hz panel adds smooth touch response']},
+{brand:'Motorola',model:'G54',ram:8,dpi:394,fps:60,chip:'Dimensity 7020',display:'IPS 120Hz',tier:'Mid',sens:{general:150,redDot:128,scope2x:110,scope4x:84,awm:52,freeLook:140},tips:['Good mid-range gaming phone','120Hz IPS responsive for aim accuracy']},
+{brand:'Motorola',model:'G34',ram:4,dpi:269,fps:60,chip:'Snapdragon 695',display:'IPS 120Hz',tier:'Mid',sens:{general:142,redDot:120,scope2x:104,scope4x:78,awm:48,freeLook:134},tips:['SD695 handles 60 FPS at Medium graphics','Budget 5G gaming — decent performance']},
+{brand:'Motorola',model:'G24',ram:4,dpi:269,fps:60,chip:'Helio G85',display:'IPS 90Hz',tier:'Low-Mid',sens:{general:136,redDot:114,scope2x:98,scope4x:74,awm:44,freeLook:128},tips:['Helio G85 at Low graphics for stable FPS','90Hz panel adds touch responsiveness']},
+{brand:'Motorola',model:'G14',ram:4,dpi:269,fps:60,chip:'Helio G85',display:'IPS 90Hz',tier:'Low-Mid',sens:{general:136,redDot:114,scope2x:98,scope4x:74,awm:44,freeLook:128},tips:['Entry budget Motorola','Low-Medium graphics for stable 60 FPS']},
+{brand:'Motorola',model:'G Power 2024',ram:4,dpi:269,fps:60,chip:'Snapdragon 685',display:'IPS 90Hz',tier:'Mid',sens:{general:140,redDot:118,scope2x:102,scope4x:76,awm:46,freeLook:132},tips:['SD685 — stable efficient chip','Long battery for marathon gaming sessions']},
+{brand:'Motorola',model:'G Stylus 2024',ram:8,dpi:395,fps:60,chip:'Helio G99',display:'IPS 120Hz',tier:'Mid',sens:{general:148,redDot:126,scope2x:108,scope4x:82,awm:52,freeLook:138},tips:['Helio G99 solid gaming performance','120Hz panel smooth for aim control']},
+
+// ── INFINIX (10) ──
+{brand:'Infinix',model:'GT 20 Pro',ram:8,dpi:394,fps:90,chip:'Dimensity 8200 Ultimate',display:'AMOLED 144Hz',tier:'High',sens:{general:174,redDot:148,scope2x:128,scope4x:100,awm:64,freeLook:164},tips:['Gaming-focused — Dimensity 8200 Ultimate','144Hz AMOLED + 90 FPS incredible smoothness','Best Infinix for competitive Free Fire 2024']},
+{brand:'Infinix',model:'GT 10 Pro',ram:8,dpi:394,fps:90,chip:'Dimensity 8050',display:'AMOLED 120Hz',tier:'High',sens:{general:170,redDot:146,scope2x:126,scope4x:98,awm:62,freeLook:160},tips:['Gaming phone with 90 FPS support','Dimensity 8050 strong gaming chip']},
+{brand:'Infinix',model:'Note 40 Pro',ram:8,dpi:394,fps:60,chip:'Helio G99 Ultra',display:'AMOLED 120Hz',tier:'High',sens:{general:160,redDot:136,scope2x:118,scope4x:90,awm:58,freeLook:150},tips:['Helio G99 Ultra best Helio gaming chip','120Hz AMOLED excellent at this price point']},
+{brand:'Infinix',model:'Note 40',ram:8,dpi:394,fps:60,chip:'Helio G99 Ultra',display:'AMOLED 120Hz',tier:'Mid+',sens:{general:158,redDot:136,scope2x:116,scope4x:88,awm:56,freeLook:148},tips:['Great value AMOLED gaming phone','Helio G99 Ultra handles 60 FPS at Medium-High']},
+{brand:'Infinix',model:'Note 30',ram:8,dpi:394,fps:60,chip:'Helio G99',display:'AMOLED 120Hz',tier:'Mid+',sens:{general:156,redDot:134,scope2x:114,scope4x:86,awm:54,freeLook:146},tips:['120Hz AMOLED at budget price','Helio G99 stable at 60 FPS']},
+{brand:'Infinix',model:'Hot 40 Pro',ram:8,dpi:269,fps:60,chip:'Helio G99',display:'IPS 120Hz',tier:'Mid',sens:{general:148,redDot:126,scope2x:108,scope4x:82,awm:52,freeLook:140},tips:['Helio G99 powerful at this budget','120Hz IPS responsive for quick aim']},
+{brand:'Infinix',model:'Hot 40i',ram:4,dpi:269,fps:60,chip:'Helio G85',display:'IPS 90Hz',tier:'Low-Mid',sens:{general:136,redDot:114,scope2x:98,scope4x:74,awm:44,freeLook:128},tips:['Budget option — Low-Medium graphics','90Hz panel adds touch accuracy']},
+{brand:'Infinix',model:'Zero 30',ram:8,dpi:394,fps:60,chip:'Dimensity 8020',display:'AMOLED 144Hz',tier:'High',sens:{general:164,redDot:140,scope2x:122,scope4x:92,awm:58,freeLook:154},tips:['144Hz AMOLED — premium display for gaming','Dimensity 8020 handles 60 FPS at High settings']},
+{brand:'Infinix',model:'Smart 8',ram:4,dpi:269,fps:30,chip:'Helio G36',display:'IPS 90Hz',tier:'Low',sens:{general:128,redDot:108,scope2x:92,scope4x:68,awm:38,freeLook:120},tips:['Entry-level — Lowest graphics + 30 FPS','Close all apps before gaming']},
+{brand:'Infinix',model:'Hot 30i',ram:4,dpi:269,fps:30,chip:'Helio G37',display:'IPS 90Hz',tier:'Low',sens:{general:128,redDot:108,scope2x:92,scope4x:68,awm:38,freeLook:120},tips:['Very budget — 30 FPS Lowest only','Tap fire, avoid spray for headshots']},
+
+// ── TECNO (8) ──
+{brand:'Tecno',model:'Pova 6 Pro',ram:8,dpi:394,fps:90,chip:'Dimensity 6080',display:'AMOLED 144Hz',tier:'High',sens:{general:166,redDot:142,scope2x:122,scope4x:94,awm:60,freeLook:156},tips:['Gaming-focused Tecno — 144Hz AMOLED!','90 FPS stable at Medium settings','Best Tecno for competitive Free Fire']},
+{brand:'Tecno',model:'Spark 30 Pro',ram:8,dpi:394,fps:60,chip:'Helio G91 Ultra',display:'AMOLED 120Hz',tier:'Mid+',sens:{general:154,redDot:132,scope2x:112,scope4x:86,awm:54,freeLook:144},tips:['Latest Tecno with AMOLED — impressive for budget','Helio G91 Ultra handles 60 FPS well']},
+{brand:'Tecno',model:'Spark 20 Pro+',ram:8,dpi:394,fps:60,chip:'Helio G99 Ultimate',display:'AMOLED 120Hz',tier:'Mid+',sens:{general:158,redDot:136,scope2x:116,scope4x:88,awm:56,freeLook:148},tips:['Helio G99 Ultimate best Helio chip','120Hz AMOLED great for the price']},
+{brand:'Tecno',model:'Camon 30 Pro',ram:8,dpi:394,fps:60,chip:'Dimensity 7020',display:'AMOLED 120Hz',tier:'Mid+',sens:{general:156,redDot:134,scope2x:114,scope4x:86,awm:54,freeLook:146},tips:['Dimensity 7020 good gaming chip','120Hz AMOLED excellent visibility']},
+{brand:'Tecno',model:'Phantom V Fold',ram:12,dpi:394,fps:60,chip:'Dimensity 9000+',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:170,redDot:146,scope2x:126,scope4x:96,awm:62,freeLook:160},tips:['Foldable flagship — unique gaming experience','Dimensity 9000+ handles max settings']},
+{brand:'Tecno',model:'Spark 20',ram:4,dpi:269,fps:60,chip:'Helio G85',display:'IPS 90Hz',tier:'Low-Mid',sens:{general:136,redDot:114,scope2x:98,scope4x:74,awm:44,freeLook:128},tips:['Budget Tecno — Low-Medium graphics','90Hz panel adds touch responsiveness']},
+{brand:'Tecno',model:'Pop 8',ram:2,dpi:269,fps:30,chip:'Helio A22',display:'IPS 60Hz',tier:'Low',sens:{general:126,redDot:106,scope2x:90,scope4x:66,awm:36,freeLook:116},tips:['Entry level — Lowest graphics 30 FPS only','Clear RAM before every match']},
+{brand:'Tecno',model:'Camon 20 Pro',ram:8,dpi:394,fps:60,chip:'Dimensity 8050',display:'AMOLED 120Hz',tier:'High',sens:{general:162,redDot:138,scope2x:120,scope4x:92,awm:58,freeLook:152},tips:['Dimensity 8050 handles 60 FPS excellently','120Hz AMOLED for competitive gaming']},
+
+// ── IQOO (16) ──
+{brand:'iQOO',model:'15',ram:12,dpi:452,fps:144,chip:'Snapdragon 8 Elite',display:'AMOLED 144Hz',tier:'Flagship',sens:{general:176,redDot:150,scope2x:130,scope4x:102,awm:68,freeLook:166},tips:['SD 8 Elite flagship power','144Hz AMOLED ultimate gaming','Best iQOO for competitive FF 2025']},
+{brand:'iQOO',model:'15R',ram:8,dpi:395,fps:120,chip:'Snapdragon 8s Elite',display:'AMOLED 120Hz',tier:'High',sens:{general:164,redDot:140,scope2x:122,scope4x:96,awm:62,freeLook:154},tips:['SD 8s Elite value flagship','120Hz AMOLED smooth']},
+{brand:'iQOO',model:'Neo 10',ram:12,dpi:452,fps:144,chip:'Snapdragon 8 Gen 3',display:'AMOLED 144Hz',tier:'Flagship',sens:{general:174,redDot:148,scope2x:128,scope4x:100,awm:66,freeLook:164},tips:['SD 8 Gen 3 flagship gaming','144Hz AMOLED buttery smooth']},
+{brand:'iQOO',model:'Neo 10R',ram:8,dpi:395,fps:120,chip:'Snapdragon 8s Gen 3',display:'AMOLED 144Hz',tier:'High',sens:{general:166,redDot:142,scope2x:124,scope4x:96,awm:62,freeLook:156},tips:['SD 8s Gen 3 flagship lite','144Hz AMOLED smooth gaming']},
+{brand:'iQOO',model:'Neo 9 Pro',ram:12,dpi:452,fps:144,chip:'Dimensity 9300',display:'AMOLED 144Hz',tier:'Flagship',sens:{general:176,redDot:150,scope2x:130,scope4x:102,awm:68,freeLook:166},tips:['Dimensity 9300 flagship power','144Hz AMOLED ultimate smoothness','Best Neo series for competitive FF']},
+{brand:'iQOO',model:'Neo 8 Pro',ram:12,dpi:452,fps:120,chip:'Snapdragon 8+ Gen 1',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:174,redDot:148,scope2x:128,scope4x:100,awm:66,freeLook:164},tips:['SD 8+ Gen 1 flagship gaming','12GB RAM multitasking beast']},
+{brand:'iQOO',model:'9',ram:12,dpi:398,fps:120,chip:'Snapdragon 8 Gen 1',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:170,redDot:146,scope2x:126,scope4x:98,awm:64,freeLook:160},tips:['SD 8 Gen 1 flagship gaming','12GB RAM multitasking beast']},
+{brand:'iQOO',model:'Z10',ram:8,dpi:395,fps:120,chip:'Dimensity 6300',display:'AMOLED 120Hz',tier:'High',sens:{general:160,redDot:136,scope2x:118,scope4x:92,awm:58,freeLook:150},tips:['Dimensity 6300 gaming optimized','120Hz AMOLED budget flagship feel']},
+{brand:'iQOO',model:'Z9 Pro',ram:8,dpi:395,fps:120,chip:'Dimensity 9200 Plus',display:'AMOLED 144Hz',tier:'Flagship',sens:{general:174,redDot:148,scope2x:128,scope4x:100,awm:66,freeLook:164},tips:['Dimensity 9200+ near-flagship','144Hz AMOLED ultra smooth']},
+{brand:'iQOO',model:'Z9s Pro',ram:8,dpi:452,fps:120,chip:'Dimensity 9300',display:'AMOLED 144Hz',tier:'Flagship',sens:{general:170,redDot:146,scope2x:126,scope4x:98,awm:64,freeLook:160},tips:['Dimensity 9300 flagship chip in Z series!','Best value flagship iQOO 2024']},
+{brand:'iQOO',model:'Z9 Lite',ram:6,dpi:395,fps:90,chip:'Snapdragon 4 Gen 2',display:'AMOLED 90Hz',tier:'Mid',sens:{general:154,redDot:132,scope2x:114,scope4x:86,awm:54,freeLook:144},tips:['Good budget 5G gaming phone','SD 4 Gen 2 handles 90 FPS stable']},
+{brand:'iQOO',model:'Z7 Pro',ram:8,dpi:452,fps:90,chip:'Dimensity 7200',display:'AMOLED 120Hz',tier:'High',sens:{general:168,redDot:144,scope2x:124,scope4x:96,awm:62,freeLook:158},tips:['Dimensity 7200 excellent 90 FPS gaming','High DPI optimized values for precision']},
+{brand:'iQOO',model:'Z6 Pro',ram:8,dpi:395,fps:90,chip:'Snapdragon 778G',display:'AMOLED 120Hz',tier:'High',sens:{general:168,redDot:144,scope2x:124,scope4x:96,awm:60,freeLook:158},tips:['SD778G gaming powerhouse','90 FPS stable at Medium-High settings']},
+{brand:'iQOO',model:'Z6 Lite',ram:4,dpi:395,fps:60,chip:'Snapdragon 4 Gen 1',display:'IPS 120Hz',tier:'Mid',sens:{general:146,redDot:124,scope2x:106,scope4x:80,awm:50,freeLook:138},tips:['Good budget option for 60 FPS','120Hz IPS smooth touch response']},
+{brand:'iQOO',model:'8 Pro',ram:12,dpi:452,fps:120,chip:'Snapdragon 888+',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:172,redDot:146,scope2x:126,scope4x:98,awm:64,freeLook:162},tips:['SD888+ flagship from 2021 still powerful','High DPI + 12GB RAM gaming beast']},
+{brand:'iQOO',model:'7 Legend',ram:8,dpi:398,fps:120,chip:'Snapdragon 888',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:170,redDot:144,scope2x:124,scope4x:96,awm:62,freeLook:160},tips:['Classic iQOO flagship SD888','Still dominates at 120Hz 2024']},
+
+// ── NOTHING (5) ──
+{brand:'Nothing',model:'Phone 3',ram:12,dpi:394,fps:120,chip:'Snapdragon 8 Gen 3',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:168,redDot:144,scope2x:126,scope4x:98,awm:64,freeLook:158},tips:['Nothing Phone 3 flagship 2025','SD 8 Gen 3 powerful — max settings','Unique Glyph interface — pro gaming phone']},
+{brand:'Nothing',model:'Phone 2a Plus',ram:12,dpi:394,fps:120,chip:'Dimensity 7350 Pro',display:'AMOLED 120Hz',tier:'High',sens:{general:166,redDot:142,scope2x:124,scope4x:96,awm:62,freeLook:156},tips:['2a Plus enhanced — D7350 Pro stronger','Best value Nothing phone for gaming']},
+{brand:'Nothing',model:'Phone 2a',ram:8,dpi:394,fps:120,chip:'Dimensity 7200 Pro',display:'AMOLED 120Hz',tier:'High',sens:{general:164,redDot:140,scope2x:122,scope4x:96,awm:62,freeLook:154},tips:['Phone 2a mid flagship gaming','Dimensity 7200 Pro handles 120Hz gaming']},
+{brand:'Nothing',model:'Phone 2',ram:12,dpi:394,fps:120,chip:'Snapdragon 8+ Gen 1',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:174,redDot:148,scope2x:128,scope4x:100,awm:66,freeLook:164},tips:['SD 8+ Gen 1 near flagship power','120Hz AMOLED excellent for Free Fire']},
+{brand:'Nothing',model:'Phone 1',ram:8,dpi:394,fps:90,chip:'Snapdragon 778G+',display:'OLED 120Hz',tier:'High',sens:{general:168,redDot:144,scope2x:124,scope4x:96,awm:60,freeLook:158},tips:['SD778G+ great gaming chip','Original Nothing phone with unique design']},
+
+// ── GOOGLE PIXEL (8) ──
+{brand:'Google',model:'Pixel 9 Pro',ram:16,dpi:510,fps:120,chip:'Google Tensor G4',display:'OLED 120Hz',tier:'Flagship',sens:{general:160,redDot:136,scope2x:118,scope4x:92,awm:58,freeLook:150},tips:['Tensor G4 excellent gaming chip','16GB RAM + 120Hz flagship performance','Android pure OS — very smooth for FF']},
+{brand:'Google',model:'Pixel 9',ram:12,dpi:422,fps:120,chip:'Google Tensor G4',display:'OLED 120Hz',tier:'Flagship',sens:{general:162,redDot:138,scope2x:120,scope4x:94,awm:60,freeLook:152},tips:['Tensor G4 powerful gaming chip','120Hz OLED smooth gameplay','Android 15 optimized for gaming']},
+{brand:'Google',model:'Pixel 8 Pro',ram:12,dpi:489,fps:120,chip:'Google Tensor G3',display:'OLED 120Hz',tier:'Flagship',sens:{general:158,redDot:134,scope2x:116,scope4x:90,awm:58,freeLook:148},tips:['Tensor G3 strong gaming chip','12GB RAM zero lag guaranteed','High DPI: these values optimized for precision']},
+{brand:'Google',model:'Pixel 8',ram:8,dpi:428,fps:120,chip:'Google Tensor G3',display:'OLED 120Hz',tier:'Flagship',sens:{general:162,redDot:138,scope2x:120,scope4x:94,awm:60,freeLook:152},tips:['Tensor G3 excellent for gaming','120Hz OLED buttery smooth']},
+{brand:'Google',model:'Pixel 7 Pro',ram:12,dpi:512,fps:120,chip:'Google Tensor G2',display:'OLED 120Hz',tier:'Flagship',sens:{general:154,redDot:130,scope2x:112,scope4x:86,awm:54,freeLook:144},tips:['Tensor G2 — strong mid-flagship chip','Ultra high DPI: lower values for precision']},
+{brand:'Google',model:'Pixel 7',ram:8,dpi:416,fps:90,chip:'Google Tensor G2',display:'OLED 90Hz',tier:'Flagship',sens:{general:162,redDot:138,scope2x:120,scope4x:92,awm:58,freeLook:152},tips:['Tensor G2 handles 90 FPS smoothly','Clean Android — no bloatware gaming']},
+{brand:'Google',model:'Pixel 6 Pro',ram:12,dpi:512,fps:120,chip:'Google Tensor G1',display:'OLED 120Hz',tier:'Flagship',sens:{general:152,redDot:130,scope2x:112,scope4x:86,awm:54,freeLook:142},tips:['Tensor G1 first Google chip','Ultra high DPI: these values give best precision']},
+{brand:'Google',model:'Pixel 6a',ram:6,dpi:429,fps:60,chip:'Google Tensor G1',display:'OLED 60Hz',tier:'High',sens:{general:158,redDot:136,scope2x:116,scope4x:88,awm:56,freeLook:148},tips:['Budget flagship from Google','Tensor G1 handles 60 FPS excellently']},
+
+// ── LAVA (6) ──
+{brand:'Lava',model:'Blaze Curve 5G',ram:8,dpi:394,fps:60,chip:'Dimensity 6080',display:'AMOLED 120Hz',tier:'Mid',sens:{general:152,redDot:130,scope2x:112,scope4x:86,awm:54,freeLook:142},tips:['Decent budget option for 60 FPS','AMOLED gives visibility advantage']},
+{brand:'Lava',model:'Storm Pro',ram:8,dpi:394,fps:60,chip:'Snapdragon 695',display:'AMOLED 120Hz',tier:'Mid+',sens:{general:154,redDot:132,scope2x:114,scope4x:86,awm:54,freeLook:144},tips:['SD695 gaming chip — solid 60 FPS','120Hz AMOLED good at this price']},
+{brand:'Lava',model:'Blaze 2 5G',ram:6,dpi:270,fps:60,chip:'Snapdragon 695',display:'IPS 90Hz',tier:'Mid',sens:{general:144,redDot:122,scope2x:106,scope4x:80,awm:50,freeLook:136},tips:['Budget Indian brand with 5G','SD695 handles 60 FPS at Medium']},
+{brand:'Lava',model:'Agni 2',ram:8,dpi:394,fps:60,chip:'Dimensity 7050',display:'AMOLED 120Hz',tier:'High',sens:{general:160,redDot:136,scope2x:118,scope4x:90,awm:58,freeLook:150},tips:['Good flagship killer from Lava','Dimensity 7050 handles 60 FPS at High settings']},
+{brand:'Lava',model:'O2',ram:4,dpi:269,fps:60,chip:'Helio G85',display:'IPS 90Hz',tier:'Low-Mid',sens:{general:136,redDot:114,scope2x:98,scope4x:74,awm:44,freeLook:128},tips:['Budget phone — Low-Medium graphics','90Hz panel helps with touch response']},
+{brand:'Lava',model:'Yuva 3 Pro',ram:4,dpi:269,fps:60,chip:'Helio G85',display:'IPS 90Hz',tier:'Low-Mid',sens:{general:134,redDot:112,scope2x:96,scope4x:72,awm:42,freeLook:126},tips:['Entry Lava phone','Low settings + close all apps before gaming']},
+
+// ── XIAOMI (8) ──
+{brand:'Xiaomi',model:'14',ram:12,dpi:395,fps:120,chip:'Snapdragon 8 Gen 3',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:170,redDot:146,scope2x:126,scope4x:98,awm:64,freeLook:160},tips:['SD 8 Gen 3 flagship gaming','120Hz AMOLED buttery smooth']},
+{brand:'Xiaomi',model:'14 Pro',ram:16,dpi:522,fps:120,chip:'Snapdragon 8 Gen 3',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:164,redDot:140,scope2x:122,scope4x:94,awm:60,freeLook:154},tips:['16GB RAM ultimate multitasking','QHD 522 DPI stunning display']},
+{brand:'Xiaomi',model:'13T Pro',ram:12,dpi:395,fps:144,chip:'Dimensity 9200 Plus',display:'AMOLED 144Hz',tier:'Flagship',sens:{general:176,redDot:150,scope2x:130,scope4x:102,awm:68,freeLook:166},tips:['Dimensity 9200+ flagship chip','144Hz ultimate gaming experience']},
+{brand:'Xiaomi',model:'13T',ram:8,dpi:395,fps:144,chip:'Dimensity 8200 Ultra',display:'AMOLED 144Hz',tier:'High',sens:{general:172,redDot:148,scope2x:128,scope4x:100,awm:66,freeLook:162},tips:['144Hz AMOLED ultra smooth','Dimensity 8200 Ultra gaming beast']},
+{brand:'Xiaomi',model:'12 Pro',ram:12,dpi:522,fps:120,chip:'Snapdragon 8 Gen 1',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:162,redDot:138,scope2x:118,scope4x:90,awm:58,freeLook:152},tips:['SD 8 Gen 1 flagship 2022','High DPI: lower sensitivity for precision']},
+{brand:'Xiaomi',model:'12',ram:8,dpi:419,fps:120,chip:'Snapdragon 8 Gen 1',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:166,redDot:142,scope2x:124,scope4x:96,awm:62,freeLook:156},tips:['SD 8 Gen 1 gaming powerhouse','120Hz AMOLED excellent tracking']},
+{brand:'Xiaomi',model:'11i',ram:8,dpi:395,fps:90,chip:'Dimensity 920',display:'AMOLED 120Hz',tier:'High',sens:{general:170,redDot:146,scope2x:126,scope4x:98,awm:62,freeLook:160},tips:['Dimensity 920 excellent 90 FPS chip','120Hz AMOLED smooth competitive gaming']},
+{brand:'Xiaomi',model:'11T Pro',ram:8,dpi:395,fps:120,chip:'Snapdragon 888',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:176,redDot:150,scope2x:130,scope4x:102,awm:68,freeLook:166},tips:['SD888 flagship — max settings all the way','120Hz AMOLED best Xiaomi 11 series']},
+
+// ── SAMSUNG S-SERIES 2022-2025 ──
+{brand:'Samsung',model:'Galaxy S22',ram:8,dpi:425,fps:120,chip:'Snapdragon 8 Gen 1',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:154,redDot:132,scope2x:114,scope4x:88,awm:56,freeLook:144},tips:['SD 8 Gen 1 flagship performance','120Hz AMOLED adaptive refresh']},
+{brand:'Samsung',model:'Galaxy S23',ram:8,dpi:425,fps:120,chip:'Snapdragon 8 Gen 2',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:156,redDot:134,scope2x:116,scope4x:90,awm:58,freeLook:146},tips:['SD 8 Gen 2 best gaming chip 2023','120Hz adaptive refresh perfect']},
+{brand:'Samsung',model:'Galaxy S24 Plus',ram:12,dpi:385,fps:120,chip:'Snapdragon 8 Gen 3',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:162,redDot:138,scope2x:120,scope4x:94,awm:62,freeLook:152},tips:['SD 8 Gen 3 + 12GB RAM','Larger display better visibility']},
+{brand:'Samsung',model:'Galaxy S25 Plus',ram:12,dpi:385,fps:120,chip:'Snapdragon 8 Elite',display:'AMOLED 120Hz',tier:'Flagship',sens:{general:164,redDot:140,scope2x:122,scope4x:96,awm:64,freeLook:154},tips:['SD 8 Elite flagship power','12GB RAM multitasking king']},
+
+];
+
+// ════ State ════
+var currentPhone = null;
+var activeFilter = '';
+var acHighlightIndex = -1;
+var filteredAC = [];
+
+// ════ Init ════
+document.addEventListener('DOMContentLoaded', function() {
+  renderPhoneGrid(PHONES);
+  setupSearch();
+  setupNav();
+});
+
+// ════ Render Grid ════
+function renderPhoneGrid(phones) {
+  var grid = document.getElementById('phonesGrid');
+  var title = document.getElementById('phonesListTitle');
+  var badge = document.getElementById('phonesCountBadge');
+  badge.textContent = phones.length;
+  title.textContent = activeFilter ? activeFilter + ' Phones' : 'All Supported Phones (' + phones.length + ')';
+
+  if (!phones.length) {
+    grid.innerHTML = '<p style="color:var(--text-muted);font-size:0.9rem;grid-column:1/-1;padding:1rem 0">No phones found.</p>';
+    return;
+  }
+
+  grid.innerHTML = phones.map(function(p) {
+    return '<div class="phone-list-item" onclick="selectPhone(\'' + esc(p.brand) + '\',\'' + esc(p.model) + '\')">' +
+      '<span class="pli-brand">' + p.brand + '</span>' +
+      '<span class="pli-name">' + p.model + '</span>' +
+      '<span class="pli-ram">' + p.ram + 'GB</span>' +
+      '</div>';
+  }).join('');
+}
+
+function esc(s) { return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
+
+// ════ Brand Filter ════
+function filterBrand(brand) {
+  activeFilter = brand;
+  document.querySelectorAll('.brand-chip').forEach(function(c) {
+    var label = c.textContent.trim();
+    c.classList.toggle('active', brand === '' ? label === 'All' : label === brand);
+  });
+  var filtered = brand ? PHONES.filter(function(p) { return p.brand === brand; }) : PHONES;
+  renderPhoneGrid(filtered);
+  document.getElementById('phoneSearchInput').value = brand ? brand : '';
+}
+
+// ════ Search ════
+function setupSearch() {
+  var input = document.getElementById('phoneSearchInput');
+  var acList = document.getElementById('autocompleteList');
+
+  input.addEventListener('input', function() {
+    var q = input.value.trim().toLowerCase();
+    if (!q) { hideAC(); renderPhoneGrid(PHONES); activeFilter = ''; return; }
+
+    var gridRes = PHONES.filter(function(p) {
+      return (p.brand + ' ' + p.model).toLowerCase().indexOf(q) !== -1;
+    });
+    renderPhoneGrid(gridRes);
+
+    filteredAC = gridRes.slice(0, 8);
+    if (!filteredAC.length) { hideAC(); return; }
+
+    acHighlightIndex = -1;
+    acList.innerHTML = filteredAC.map(function(p, i) {
+      return '<div class="autocomplete-item" onclick="selectAcItem(' + i + ')">' +
+        '<span class="ac-brand">' + p.brand + '</span>' +
+        '<span class="ac-model">' + p.model + '</span>' +
+        '<span class="ac-specs">' + p.ram + 'GB · ' + p.fps + 'FPS</span>' +
+        '</div>';
+    }).join('');
+    acList.classList.add('show');
+  });
+
+  input.addEventListener('keydown', function(e) {
+    var items = acList.querySelectorAll('.autocomplete-item');
+    if (e.key === 'ArrowDown') { e.preventDefault(); acHighlightIndex = Math.min(acHighlightIndex+1,items.length-1); updateACHL(items); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); acHighlightIndex = Math.max(acHighlightIndex-1,0); updateACHL(items); }
+    else if (e.key === 'Enter') { if (acHighlightIndex>=0&&filteredAC[acHighlightIndex]) selectAcItem(acHighlightIndex); else if(filteredAC.length) selectAcItem(0); }
+    else if (e.key === 'Escape') hideAC();
+  });
+
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.search-input-wrap')) hideAC();
+  });
+}
+
+function updateACHL(items) {
+  items.forEach(function(it, i) { it.classList.toggle('highlighted', i === acHighlightIndex); });
+}
+
+function selectAcItem(idx) {
+  var p = filteredAC[idx];
+  if (!p) return;
+  document.getElementById('phoneSearchInput').value = p.brand + ' ' + p.model;
+  hideAC();
+  selectPhone(p.brand, p.model);
+}
+
+function hideAC() {
+  document.getElementById('autocompleteList').classList.remove('show');
+  acHighlightIndex = -1;
+}
+
+// ════ Select Phone ════
+function selectPhone(brand, model) {
+  var phone = PHONES.find(function(p) { return p.brand === brand && p.model === model; });
+  if (!phone) return;
+  currentPhone = phone;
+
+  document.getElementById('resultPlaceholder').style.display = 'none';
+  document.getElementById('phoneResultName').textContent = brand + ' ' + model;
+  document.getElementById('phoneBrandAbbr').textContent = brand.substring(0,2).toUpperCase();
+
+  document.getElementById('phoneSpecsRow').innerHTML =
+    '<span class="spec-chip ram">💾 ' + phone.ram + 'GB RAM</span>' +
+    '<span class="spec-chip fps">⚡ ' + phone.fps + ' FPS</span>' +
+    '<span class="spec-chip dpi">🖥 ' + phone.dpi + ' DPI</span>' +
+    '<span class="spec-chip chip">🔲 ' + phone.chip + '</span>' +
+    '<span class="spec-chip disp">📺 ' + phone.display + '</span>' +
+    '<span class="spec-chip tier">🏆 ' + phone.tier + '</span>';
+
+  var labels = [
+    {key:'general',label:'🔵 General'},{key:'redDot',label:'🔴 Red Dot'},
+    {key:'scope2x',label:'🟡 2x Scope'},{key:'scope4x',label:'🟢 4x Scope'},
+    {key:'awm',label:'⚪ AWM Scope'},{key:'freeLook',label:'👁️ Free Look'}
+  ];
+
+  document.getElementById('phoneSensGrid').innerHTML = labels.map(function(s) {
+    return '<div class="psens-item">' +
+      '<div class="psens-label">' + s.label + '</div>' +
+      '<div class="psens-value" id="pv_' + s.key + '">0</div>' +
+      '<div class="psens-bar-track"><div class="psens-bar-fill" id="pb_' + s.key + '"></div></div>' +
+      '</div>';
+  }).join('');
+
+  setTimeout(function() {
+    labels.forEach(function(s) { animateVal('pv_'+s.key,'pb_'+s.key,phone.sens[s.key]); });
+  }, 60);
+
+  document.getElementById('phoneTipsList').innerHTML =
+    phone.tips.map(function(t) { return '<li>' + t + '</li>'; }).join('');
+
+  document.getElementById('phoneResultCard').classList.add('show');
+  document.getElementById('phoneSearchInput').value = brand + ' ' + model;
+
+  setTimeout(function() {
+    document.getElementById('phoneResultCard').scrollIntoView({behavior:'smooth',block:'start'});
+  }, 100);
+}
+
+// ════ Animate ════
+function animateVal(valId, barId, target) {
+  var el = document.getElementById(valId);
+  var bar = document.getElementById(barId);
+  var start = null;
+  function step(ts) {
+    if (!start) start = ts;
+    var prog = Math.min((ts-start)/700,1);
+    var eased = 1 - Math.pow(1-prog,3);
+    el.textContent = Math.round(eased*target);
+    if (prog < 1) requestAnimationFrame(step);
+    else el.textContent = target;
+  }
+  requestAnimationFrame(step);
+  setTimeout(function() { bar.style.width = target + '%'; }, 60);
+}
+
+// ════ Copy ════
+function copyPhoneSens() {
+  if (!currentPhone) return;
+  var p = currentPhone, s = p.sens;
+  var text = ['🎯 '+p.brand+' '+p.model+' — Free Fire Sensitivity','──────────────────────',
+    'General:    '+s.general,'Red Dot:    '+s.redDot,'2x Scope:   '+s.scope2x,
+    '4x Scope:   '+s.scope4x,'AWM Scope:  '+s.awm,'Free Look:  '+s.freeLook,
+    '──────────────────────','From: FFSensPro — Sensi by Phone'].join('\n');
+  if (navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(showToast).catch(function(){fbCopy(text);});
+  else fbCopy(text);
+}
+
+function fbCopy(text) {
+  var ta = document.createElement('textarea');
+  ta.value = text; ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try { document.execCommand('copy'); } catch(e) {}
+  document.body.removeChild(ta); showToast();
+}
+
+function showToast() {
+  var t = document.getElementById('copyToast');
+  t.classList.remove('hidden');
+  setTimeout(function() { t.classList.add('hidden'); }, 2500);
+}
+
+// ════ Nav ════
+function setupNav() {
+  var toggle = document.getElementById('navToggle');
+  var links = document.getElementById('navLinks');
+  if (toggle && links) {
+    toggle.addEventListener('click', function() { links.classList.toggle('open'); });
+    links.querySelectorAll('a').forEach(function(a) {
+      a.addEventListener('click', function() { links.classList.remove('open'); });
+    });
+  }
+}
+</script>
+<script>(function(){try{var s=JSON.parse(localStorage.getItem("ffsp_session")||"null");if(!s||!s.loggedIn||!s.subscribed){localStorage.removeItem("ffsp_session");sessionStorage.clear();window.location.replace("login.html");}}catch(e){localStorage.removeItem("ffsp_session");sessionStorage.clear();window.location.replace("login.html");}})();</script>
+</body>
+</html>

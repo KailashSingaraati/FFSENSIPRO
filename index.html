@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FF Sensitivity Pro - Free Fire Sensitivity Generator</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    .nav-auth-btn {
+      background: linear-gradient(135deg, var(--accent), #ff4500);
+      color: #fff !important;
+      padding: 0.4rem 1rem !important;
+      border-radius: 8px !important;
+      font-weight: 700 !important;
+      transition: all 0.2s !important;
+    }
+    .nav-auth-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(255,107,0,0.4) !important;
+      background: linear-gradient(135deg, var(--accent), #ff4500) !important;
+      color: #fff !important;
+    }
+    .nav-user-chip {
+      color: var(--blue) !important;
+      font-size: 0.8rem !important;
+      background: rgba(0,200,255,0.08) !important;
+      border: 1px solid var(--border-blue) !important;
+    }
+  </style>
+</head>
+<body>
+  <!-- NAV -->
+  <nav class="navbar">
+    <div class="nav-logo">
+      <img src="assets/logo.png" alt="logo" onerror="this.style.display='none'" />
+      <span>FF<span class="accent">Sens</span>Pro</span>
+    </div>
+    <div class="nav-toggle" id="navToggle">&#9776;</div>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="generator.html">Generator</a></li>
+      <li><a href="headshot-generator.html">🎯 Headshot Gen</a></li>
+      <li><a href="best-sensitivity.html">Best Sens</a></li>
+      <li><a href="sensi-by-phone.html">📱 Sensi by Phone</a></li>
+      <li><a href="pc-sensi.html">🖥️ PC Sensi</a></li>
+      <li><a href="lag-fix.html">Lag Fix</a></li>
+      <li><a href="about.html">About</a></li>
+      <li id="navAuthItem"><a href="login.html" class="nav-auth-btn">Login</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="particles" id="particles"></div>
+    <div class="hero-content">
+      <div class="badge">🔥 Free Fire Pro Tool</div>
+      <h1>Get Your <span class="accent">Perfect</span><br/>Sensitivity Settings</h1>
+      <p>Enter your phone details and instantly get custom-tuned sensitivity settings for Free Fire. Boost headshots, reduce lag &amp; dominate every match!</p>
+      <div class="hero-btns">
+        <a href="generator.html" class="btn-primary">Generate Now 🎯</a>
+        <a href="best-sensitivity.html" class="btn-secondary">View Best Sens</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><span class="num">50K+</span><span>Users</span></div>
+        <div class="stat"><span class="num">99%</span><span>Accuracy</span></div>
+        <div class="stat"><span class="num">Free</span><span>Always</span></div>
+      </div>
+    </div>
+    <div class="hero-img">
+      <div class="phone-mockup">
+        <div class="phone-screen">
+          <div class="sens-preview">
+            <div class="sens-row"><span>General</span><span class="val">85</span></div>
+            <div class="sens-row"><span>Red Dot</span><span class="val">72</span></div>
+            <div class="sens-row"><span>2x Scope</span><span class="val">65</span></div>
+            <div class="sens-row"><span>4x Scope</span><span class="val">50</span></div>
+            <div class="sens-row"><span>AWM Scope</span><span class="val">30</span></div>
+            <div class="sens-row"><span>Free Look</span><span class="val">78</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features">
+    <div class="container">
+      <h2 class="section-title">Why <span class="accent">FF Sens Pro?</span></h2>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="icon">🎯</div>
+          <h3>Smart Calculator</h3>
+          <p>Calculates based on your RAM, DPI, screen size, FPS and play style for perfect results.</p>
+        </div>
+        <div class="feature-card">
+          <div class="icon">⚡</div>
+          <h3>Instant Results</h3>
+          <p>Generate custom sensitivity in seconds. No login required to browse.</p>
+        </div>
+        <div class="feature-card">
+          <div class="icon">🏆</div>
+          <h3>Pro Player Settings</h3>
+          <p>Access sensitivity used by top Free Fire players and streamers worldwide.</p>
+        </div>
+        <div class="feature-card">
+          <div class="icon">🔧</div>
+          <h3>Lag Fix Tips</h3>
+          <p>Dedicated lag fix guide for low-end Android devices to get smooth gameplay.</p>
+        </div>
+        <div class="feature-card">
+          <div class="icon">📱</div>
+          <h3>Auto Device Detect</h3>
+          <p>Automatically detects your screen DPI, size and FPS capability for easy setup.</p>
+        </div>
+        <div class="feature-card">
+          <div class="icon">💯</div>
+          <h3>100% Free</h3>
+          <p>All features completely free forever. No hidden charges or premium walls.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how-it-works">
+    <div class="container">
+      <h2 class="section-title">How It <span class="accent">Works</span></h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">01</div>
+          <div class="step-info">
+            <h3>Login / Sign Up</h3>
+            <p>Create a free account or use guest mode instantly.</p>
+          </div>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <div class="step-info">
+            <h3>Auto-Detect Phone</h3>
+            <p>Click Auto Detect to fill your phone specs automatically.</p>
+          </div>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <div class="step-info">
+            <h3>Click Generate</h3>
+            <p>Hit generate and let our algorithm compute your settings.</p>
+          </div>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step">
+          <div class="step-num">04</div>
+          <div class="step-info">
+            <h3>Dominate!</h3>
+            <p>Copy settings into Free Fire and start getting headshots!</p>
+          </div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:2.5rem">
+        <a href="generator.html" class="btn-primary">Start Generating 🚀</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-logo">FF<span class="accent">Sens</span>Pro</div>
+      <p>Best Free Fire Sensitivity Generator Tool — Made for Gamers</p>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="generator.html">Generator</a>
+        <a href="headshot-generator.html">🎯 Headshot Gen</a>
+        <a href="best-sensitivity.html">Best Sens</a>
+        <a href="sensi-by-phone.html">📱 Sensi by Phone</a>
+        <a href="pc-sensi.html">🖥️ PC Sensi</a>
+        <a href="lag-fix.html">Lag Fix</a>
+        <a href="about.html">About</a>
+      </div>
+      <p class="copy">© 2024 FFSensPro. Not affiliated with Garena Free Fire.</p>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+  <script>
+    // Redirect to login if not logged in and subscribed
+    (function() {
+      try {
+        var sess = JSON.parse(localStorage.getItem('ffsp_session') || 'null');
+        if (!sess || !sess.loggedIn || !sess.subscribed) {
+          window.location.href = 'login.html';
+          return;
+        }
+        var authItem = document.getElementById('navAuthItem');
+        if (authItem) {
+          authItem.innerHTML = '<a href="generator.html" class="nav-auth-btn nav-user-chip">👤 ' + (sess.username || 'User') + '</a>';
+        }
+      } catch(e) {
+        window.location.href = 'login.html';
+      }
+    })();
+  </script>
+</body>
+</html>

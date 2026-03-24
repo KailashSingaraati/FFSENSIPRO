@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sensitivity Generator - FF Sens Pro</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ── User bar ── */
+    .user-bar {
+      background: rgba(0,200,255,0.07);
+      border-bottom: 1px solid var(--border-blue);
+      padding: 0.55rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.88rem;
+      color: var(--blue);
+      font-weight: 600;
+      margin-top: 62px;
+    }
+
+    .user-bar span { display: flex; align-items: center; gap: 0.5rem; }
+
+    .user-bar button {
+      background: rgba(255,51,102,0.12);
+      border: 1px solid rgba(255,51,102,0.3);
+      color: var(--red);
+      padding: 0.3rem 0.9rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      font-size: 0.83rem;
+      transition: all 0.2s;
+    }
+
+    .user-bar button:hover {
+      background: rgba(255,51,102,0.2);
+    }
+
+    /* ── Sensitivity Level Selection ── */
+    .sens-level-selector {
+      margin-bottom: 1.5rem;
+      background: rgba(0,200,255,0.05);
+      border: 1px solid var(--border-blue);
+      border-radius: 12px;
+      padding: 1.2rem;
+    }
+
+    .sens-level-selector h3 {
+      color: var(--blue);
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .sens-level-buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.8rem;
+    }
+
+    .sens-level-btn {
+      background: var(--bg-card2);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 0.9rem 1rem;
+      cursor: pointer;
+      transition: all 0.25s;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sens-level-btn:before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, transparent, rgba(255,107,0,0.1));
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+
+    .sens-level-btn:hover:before {
+      opacity: 1;
+    }
+
+    .sens-level-btn:hover {
+      border-color: rgba(255,107,0,0.4);
+      transform: translateY(-2px);
+    }
+
+    .sens-level-btn.active {
+      border-color: var(--accent);
+      background: linear-gradient(135deg, rgba(255,107,0,0.15), rgba(255,69,0,0.1));
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(255,107,0,0.3);
+    }
+
+    .sens-level-btn .level-icon {
+      font-size: 1.8rem;
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+
+    .sens-level-btn .level-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--text);
+      margin-bottom: 0.25rem;
+      display: block;
+    }
+
+    .sens-level-btn.active .level-title {
+      color: var(--accent);
+    }
+
+    .sens-level-btn .level-desc {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: block;
+    }
+
+    /* ── Enhanced Copy Button ── */
+    .btn-copy-sens {
+      background: linear-gradient(135deg, var(--accent), #ff4500) !important;
+      border: none !important;
+      color: #fff !important;
+      padding: 0.85rem 1.8rem !important;
+      border-radius: 10px !important;
+      font-family: 'Orbitron', monospace !important;
+      font-size: 0.85rem !important;
+      font-weight: 700 !important;
+      letter-spacing: 1.5px !important;
+      cursor: pointer !important;
+      transition: all 0.3s ease !important;
+      box-shadow: 0 6px 20px rgba(255,107,0,0.4) !important;
+      text-transform: uppercase;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-copy-sens:before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, transparent, rgba(255,255,255,0.2));
+      transform: translateX(-100%);
+      transition: transform 0.5s;
+    }
+
+    .btn-copy-sens:hover:before {
+      transform: translateX(100%);
+    }
+
+    .btn-copy-sens:hover {
+      transform: translateY(-3px) !important;
+      box-shadow: 0 8px 28px rgba(255,107,0,0.6) !important;
+    }
+
+    .btn-copy-sens:active {
+      transform: translateY(-1px) !important;
+      box-shadow: 0 4px 15px rgba(255,107,0,0.5) !important;
+    }
+
+    .btn-copy-sens .copy-icon {
+      font-size: 1.1rem;
+      vertical-align: middle;
+      margin-right: 0.4rem;
+    }
+
+    /* ── Auto detect banner ── */
+    .detect-banner {
+      background: linear-gradient(135deg, rgba(0,200,255,0.1), rgba(255,107,0,0.08));
+      border: 1px solid var(--border-blue);
+      border-radius: 12px;
+      padding: 1.1rem 1.5rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .detect-banner-info { display: flex; align-items: center; gap: 0.8rem; }
+    .detect-banner-icon { font-size: 1.6rem; }
+    .detect-banner-text h4 { color: var(--blue); font-size: 0.95rem; font-weight: 700; margin-bottom: 0.15rem; }
+    .detect-banner-text p { color: var(--text-muted); font-size: 0.82rem; }
+
+    .btn-detect {
+      background: linear-gradient(135deg, var(--blue), #0066aa);
+      border: none;
+      color: #fff;
+      padding: 0.6rem 1.4rem;
+      border-radius: 8px;
+      font-family: 'Orbitron', monospace;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(0,200,255,0.25);
+    }
+
+    .btn-detect:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(0,200,255,0.4); }
+
+    /* ── Detected badge on select ── */
+    .detected-badge {
+      display: inline-block;
+      background: rgba(0,255,136,0.15);
+      border: 1px solid rgba(0,255,136,0.3);
+      color: var(--green);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      margin-left: 0.4rem;
+      vertical-align: middle;
+    }
+
+    .form-group label { display: flex; align-items: center; flex-wrap: wrap; gap: 0.3rem; }
+    .quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-top:.8rem;}
+    .quick-actions button{width:100%;padding:.72rem;border-radius:9px;border:1px solid var(--border);background:var(--bg-card2);color:var(--text);font-family:'Rajdhani',sans-serif;font-weight:700;cursor:pointer;transition:all .2s;}
+    .quick-actions button:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px);}
+
+    /* ── Generating overlay on output ── */
+    .generating-overlay {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(10,12,20,0.85);
+      border-radius: 16px;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 1rem;
+      z-index: 10;
+    }
+
+    .generating-overlay.show { display: flex; }
+
+    .gen-spinner {
+      width: 50px; height: 50px;
+      border: 4px solid rgba(255,107,0,0.15);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .gen-overlay-text {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.85rem;
+      color: var(--accent);
+      letter-spacing: 2px;
+    }
+
+    .gen-output-card { position: relative; }
+
+    /* ── Device info chip ── */
+    .detected-device-info {
+      background: rgba(0,200,255,0.08);
+      border: 1px solid var(--border-blue);
+      border-radius: 10px;
+      padding: 0.8rem 1rem;
+      margin-bottom: 1.2rem;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      display: none;
+    }
+
+    .detected-device-info.show { display: block; }
+
+    .detected-device-info strong { color: var(--blue); }
+
+    /* ── Form select auto-highlighted ── */
+    select.auto-filled {
+      border-color: rgba(0,255,136,0.4) !important;
+      box-shadow: 0 0 0 2px rgba(0,255,136,0.1) !important;
+    }
+
+    @media (max-width: 640px) {
+      .sens-level-buttons {
+        grid-template-columns: 1fr;
+      }
+      .quick-actions{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body style="visibility:hidden">
+  <!-- AUTH GUARD: body hidden until session verified — prevents flash of content -->
+  <!-- NAV -->
+  <nav class="navbar">
+    <div class="nav-logo">
+      <span>FF<span class="accent">Sens</span>Pro</span>
+    </div>
+    <div class="nav-toggle" id="navToggle">&#9776;</div>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="generator.html" class="active">Generator</a></li>
+      <li><a href="headshot-generator.html">🎯 Headshot Gen</a></li>
+      <li><a href="best-sensitivity.html">Best Sens</a></li>
+      <li><a href="sensi-by-phone.html">📱 Sensi by Phone</a></li>
+      <li><a href="pc-sensi.html">🖥️ PC Sensi</a></li>
+      <li><a href="lag-fix.html">Lag Fix</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+  </nav>
+
+  <!-- USER BAR (injected by JS) -->
+  <div class="user-bar" id="userBar">
+    <span>👤 Welcome, <strong id="userNameDisplay">...</strong></span>
+    <button onclick="doLogout(event)">🚪 Logout</button>
+  </div>
+
+  <div class="page-header" style="margin-top:0">
+    <h1>🎯 Sensitivity <span class="accent">Generator</span></h1>
+    <p>Enter your phone details to get custom sensitivity settings</p>
+  </div>
+
+  <section class="generator-section">
+    <div class="container">
+      <div class="generator-wrapper">
+        <!-- INPUT FORM -->
+        <div class="gen-form-card">
+          <h2>📱 Your Phone Details</h2>
+
+          <!-- PHONE MODEL FIELD -->
+          <div class="form-group" style="margin-bottom:1rem">
+            <label>📱 Phone Model <span style="font-size:0.75rem;color:var(--text-muted);font-weight:500;">(Optional — auto-fills specs)</span></label>
+            <div style="position:relative">
+              <input type="text" id="phoneModelInput"
+                placeholder="e.g. Redmi Note 12, Samsung A54..."
+                style="width:100%;background:var(--bg-card2);border:2px solid var(--border);border-radius:10px;color:var(--text);font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:600;padding:0.75rem 1rem;outline:none;transition:border-color 0.2s;letter-spacing:0.4px;"
+                autocomplete="off" spellcheck="false"
+                oninput="onPhoneModelInput(this.value)"
+                onkeydown="if(event.key==='Enter'){event.preventDefault();onPhoneModelEnter();}"
+              />
+              <div class="autocomplete-list-gen" id="autocompleteListGen"></div>
+            </div>
+          </div>
+
+          <!-- AUTO DETECT BANNER -->
+          <div class="detect-banner">
+            <div class="detect-banner-info">
+              <div class="detect-banner-icon">🔎</div>
+              <div class="detect-banner-text">
+                <h4>Auto-Detect Phone Specs</h4>
+                <p>Automatically fill RAM, DPI, Screen Size & FPS</p>
+              </div>
+            </div>
+            <button class="btn-detect" onclick="autoDetect()">AUTO DETECT</button>
+          </div>
+
+          <div class="detected-device-info" id="detectedDeviceInfo">
+            Detected: <strong id="detectedDeviceName">...</strong>
+          </div>
+
+          <!-- SENSITIVITY LEVEL SELECTOR -->
+          <div class="sens-level-selector">
+            <h3>🎚️ Choose Sensitivity Level</h3>
+            <div class="sens-level-buttons">
+              <div class="sens-level-btn" data-level="low" onclick="selectSensLevel('low', this)">
+                <span class="level-icon">🐢</span>
+                <span class="level-title">Low</span>
+                <span class="level-desc">Precise aim, slower turns</span>
+              </div>
+              <div class="sens-level-btn active" data-level="medium" onclick="selectSensLevel('medium', this)">
+                <span class="level-icon">⚖️</span>
+                <span class="level-title">Medium</span>
+                <span class="level-desc">Balanced & recommended</span>
+              </div>
+              <div class="sens-level-btn" data-level="high" onclick="selectSensLevel('high', this)">
+                <span class="level-icon">🚀</span>
+                <span class="level-title">High</span>
+                <span class="level-desc">Fast reactions, quick flicks</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>💾 RAM <span class="detected-badge" id="ramBadge" style="display:none">AUTO</span></label>
+            <select id="ram">
+              <option value="">Select RAM</option>
+              <option value="2">2GB</option>
+              <option value="3">3GB</option>
+              <option value="4">4GB</option>
+              <option value="6">6GB</option>
+              <option value="8">8GB</option>
+              <option value="12">12GB+</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>📐 Screen DPI <span class="detected-badge" id="dpiBadge" style="display:none">AUTO</span></label>
+            <select id="dpi">
+              <option value="">Select DPI</option>
+              <option value="240">240 (Low)</option>
+              <option value="320">320 (Medium)</option>
+              <option value="400">400 (HD)</option>
+              <option value="480">480 (Full HD)</option>
+              <option value="560">560 (Quad HD)</option>
+              <option value="640">640 (Ultra HD)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>📏 Screen Size <span class="detected-badge" id="screenBadge" style="display:none">AUTO</span></label>
+            <select id="screen">
+              <option value="">Select Size</option>
+              <option value="5.5">5.5 inch</option>
+              <option value="6">6 inch</option>
+              <option value="6.5">6.5 inch</option>
+              <option value="6.7">6.7 inch</option>
+              <option value="6.9">6.9 inch+</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>⚡ FPS Capability <span class="detected-badge" id="fpsBadge" style="display:none">AUTO</span></label>
+            <select id="fps">
+              <option value="">Select FPS</option>
+              <option value="30">30 FPS</option>
+              <option value="60">60 FPS</option>
+              <option value="90">90 FPS</option>
+              <option value="120">120 FPS+</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>🎯 Play Style</label>
+            <select id="playstyle">
+              <option value="">Select Style</option>
+              <option value="rush">Rush (Close Combat)</option>
+              <option value="balanced">Balanced (All-Round)</option>
+              <option value="sniper">Sniper (Long Range)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>🎧 Headset</label>
+            <select id="headset">
+              <option value="no">No</option>
+              <option value="yes">Yes</option>
+            </select>
+          </div>
+
+          <button class="btn-generate" onclick="generateSens()">🚀 GENERATE SENSITIVITY</button>
+          <button class="btn-reset" onclick="resetForm()">🔄 Reset</button>
+        </div>
+
+        <!-- OUTPUT CARD -->
+        <div class="gen-output-card">
+          <div class="generating-overlay" id="generatingOverlay">
+            <div class="gen-spinner"></div>
+            <div class="gen-overlay-text">CALCULATING...</div>
+          </div>
+
+          <div id="outputPlaceholder" class="output-placeholder">
+            <div class="placeholder-icon">🎮</div>
+            <p>Enter your details and click Generate to see your custom sensitivity settings!</p>
+          </div>
+
+          <div id="outputResult" class="output-result hidden">
+            <h2>🎯 Your Custom Sensitivity</h2>
+
+            <div class="sens-item">
+              <div class="sens-label">
+                <span class="emoji">🎮</span>
+                <span>General</span>
+              </div>
+              <div class="sens-value" id="sensGeneral">0</div>
+              <div class="sens-bar"><div class="sens-bar-fill" id="barGeneral"></div></div>
+            </div>
+
+            <div class="sens-item">
+              <div class="sens-label">
+                <span class="emoji">🔴</span>
+                <span>Red Dot</span>
+              </div>
+              <div class="sens-value" id="sensRedDot">0</div>
+              <div class="sens-bar"><div class="sens-bar-fill" id="barRedDot"></div></div>
+            </div>
+
+            <div class="sens-item">
+              <div class="sens-label">
+                <span class="emoji">🔭</span>
+                <span>2x Scope</span>
+              </div>
+              <div class="sens-value" id="sens2x">0</div>
+              <div class="sens-bar"><div class="sens-bar-fill" id="bar2x"></div></div>
+            </div>
+
+            <div class="sens-item">
+              <div class="sens-label">
+                <span class="emoji">🎯</span>
+                <span>4x Scope</span>
+              </div>
+              <div class="sens-value" id="sens4x">0</div>
+              <div class="sens-bar"><div class="sens-bar-fill" id="bar4x"></div></div>
+            </div>
+
+            <div class="sens-item">
+              <div class="sens-label">
+                <span class="emoji">🔫</span>
+                <span>AWM Scope</span>
+              </div>
+              <div class="sens-value" id="sensAWM">0</div>
+              <div class="sens-bar"><div class="sens-bar-fill" id="barAWM"></div></div>
+            </div>
+
+            <div class="sens-item">
+              <div class="sens-label">
+                <span class="emoji">👀</span>
+                <span>Free Look</span>
+              </div>
+              <div class="sens-value" id="sensFreeLook">0</div>
+              <div class="sens-bar"><div class="sens-bar-fill" id="barFreeLook"></div></div>
+            </div>
+
+            <button class="btn-copy-sens" onclick="copySensitivity()">
+              <span class="copy-icon">📋</span> Copy Sensitivity
+            </button>
+            <div class="quick-actions">
+              <button type="button" onclick="applyHeadshotBoost()">🔥 Headshot Boost</button>
+              <button type="button" onclick="applyStabilityTune()">🛡️ Stability Tune</button>
+            </div>
+
+            <div class="tips-section">
+              <h3>💡 Pro Tips</h3>
+              <ul id="tipsList"></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="copy-toast hidden" id="copyToast">✅ Sensitivity Copied to Clipboard!</div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-logo">FF<span class="accent">Sens</span>Pro</div>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="generator.html">Generator</a>
+        <a href="headshot-generator.html">🎯 Headshot Gen</a>
+        <a href="best-sensitivity.html">Best Sens</a>
+        <a href="sensi-by-phone.html">📱 Sensi by Phone</a>
+        <a href="pc-sensi.html">🖥️ PC Sensi</a>
+        <a href="lag-fix.html">Lag Fix</a>
+        <a href="about.html">About</a>
+      </div>
+      <p class="copy">© 2024 FFSensPro. Not affiliated with Garena Free Fire.</p>
+    </div>
+  </footer>
+
+  <script>
+    var selectedSensLevel = 'medium'; // Default level
+
+    function selectSensLevel(level, btn) {
+      selectedSensLevel = level;
+      document.querySelectorAll('.sens-level-btn').forEach(function(b) {
+        b.classList.remove('active');
+      });
+      btn.classList.add('active');
+    }
+
+    var phoneDatabase = [
+      // Redmi
+      {name:'Redmi Note 14 Pro+',ram:12,dpi:480,screen:6.67,fps:90},
+      {name:'Redmi Note 14 Pro',ram:8,dpi:480,screen:6.67,fps:90},
+      {name:'Redmi Note 14',ram:6,dpi:400,screen:6.67,fps:60},
+      {name:'Redmi Note 13 Pro+',ram:8,dpi:480,screen:6.67,fps:90},
+      {name:'Redmi Note 13 Pro',ram:8,dpi:480,screen:6.67,fps:60},
+      {name:'Redmi Note 13',ram:6,dpi:400,screen:6.67,fps:60},
+      {name:'Redmi Note 12 Pro+',ram:8,dpi:480,screen:6.67,fps:60},
+      {name:'Redmi Note 12 Pro',ram:6,dpi:400,screen:6.67,fps:60},
+      {name:'Redmi Note 12',ram:4,dpi:400,screen:6.67,fps:60},
+      {name:'Redmi Note 11 Pro+',ram:6,dpi:400,screen:6.67,fps:60},
+      {name:'Redmi Note 11 Pro',ram:6,dpi:400,screen:6.67,fps:60},
+      {name:'Redmi Note 11',ram:4,dpi:400,screen:6.43,fps:60},
+      {name:'Redmi Note 10 Pro',ram:6,dpi:400,screen:6.67,fps:60},
+      {name:'Redmi Note 10',ram:4,dpi:400,screen:6.43,fps:60},
+      {name:'Redmi Note 9 Pro',ram:4,dpi:400,screen:6.67,fps:60},
+      {name:'Redmi Note 8 Pro',ram:6,dpi:400,screen:6.53,fps:60},
+      {name:'Redmi 13C',ram:4,dpi:240,screen:6.74,fps:60},
+      {name:'Redmi 12C',ram:4,dpi:240,screen:6.71,fps:30},
+      {name:'Redmi 10C',ram:4,dpi:240,screen:6.71,fps:30},
+      {name:'Redmi 9A',ram:2,dpi:240,screen:6.53,fps:30},
+      {name:'Redmi 9C',ram:2,dpi:240,screen:6.53,fps:30},
+      {name:'Redmi A3',ram:4,dpi:240,screen:6.71,fps:30},
+      {name:'Redmi A2+',ram:2,dpi:240,screen:6.52,fps:30},
+      {name:'Redmi K60 Pro',ram:12,dpi:400,screen:6.67,fps:90},
+      {name:'Redmi K50i',ram:6,dpi:400,screen:6.6,fps:60},
+      {name:'Redmi K40',ram:8,dpi:400,screen:6.67,fps:90},
+      {name:'Redmi 12 5G',ram:4,dpi:400,screen:6.79,fps:60},
+      // Samsung
+      {name:'Samsung Galaxy A55',ram:8,dpi:400,screen:6.6,fps:60},
+      {name:'Samsung Galaxy A54',ram:6,dpi:400,screen:6.4,fps:60},
+      {name:'Samsung Galaxy A35',ram:6,dpi:400,screen:6.6,fps:60},
+      {name:'Samsung Galaxy A34',ram:6,dpi:400,screen:6.6,fps:60},
+      {name:'Samsung Galaxy A25',ram:8,dpi:400,screen:6.5,fps:60},
+      {name:'Samsung Galaxy A15',ram:4,dpi:240,screen:6.5,fps:60},
+      {name:'Samsung Galaxy A14',ram:4,dpi:240,screen:6.6,fps:30},
+      {name:'Samsung Galaxy A53',ram:6,dpi:400,screen:6.5,fps:60},
+      {name:'Samsung Galaxy A52s',ram:6,dpi:400,screen:6.5,fps:60},
+      {name:'Samsung Galaxy M55',ram:8,dpi:400,screen:6.7,fps:60},
+      {name:'Samsung Galaxy M35',ram:6,dpi:400,screen:6.7,fps:60},
+      {name:'Samsung Galaxy M34',ram:6,dpi:400,screen:6.5,fps:60},
+      {name:'Samsung Galaxy M32',ram:4,dpi:240,screen:6.4,fps:60},
+      {name:'Samsung Galaxy F55',ram:8,dpi:400,screen:6.7,fps:60},
+      {name:'Samsung Galaxy S24 FE',ram:8,dpi:400,screen:6.7,fps:90},
+      {name:'Samsung Galaxy S24',ram:8,dpi:480,screen:6.2,fps:120},
+      {name:'Samsung Galaxy S24 Plus',ram:12,dpi:400,screen:6.7,fps:120},
+      {name:'Samsung Galaxy S24 Ultra',ram:12,dpi:560,screen:6.8,fps:120},
+      {name:'Samsung Galaxy S25',ram:12,dpi:480,screen:6.2,fps:120},
+      {name:'Samsung Galaxy S25 Ultra',ram:12,dpi:560,screen:6.9,fps:120},
+      {name:'Samsung Galaxy S23',ram:8,dpi:480,screen:6.1,fps:120},
+      {name:'Samsung Galaxy S23 FE',ram:8,dpi:400,screen:6.4,fps:90},
+      {name:'Samsung Galaxy S22',ram:8,dpi:480,screen:6.1,fps:120},
+      {name:'Samsung Galaxy A73',ram:8,dpi:400,screen:6.7,fps:60},
+      {name:'Samsung Galaxy A72',ram:8,dpi:400,screen:6.7,fps:60},
+      {name:'Samsung Galaxy A32',ram:4,dpi:400,screen:6.5,fps:60},
+      {name:'Samsung Galaxy A05s',ram:4,dpi:240,screen:6.7,fps:60},
+      {name:'Samsung Galaxy F15',ram:4,dpi:240,screen:6.5,fps:60},
+      {name:'Samsung Galaxy M13',ram:4,dpi:240,screen:6.6,fps:60},
+      {name:'Samsung Galaxy A03s',ram:3,dpi:240,screen:6.5,fps:30},
+      // Realme
+      {name:'Realme 13 Pro+',ram:8,dpi:480,screen:6.7,fps:90},
+      {name:'Realme 13 Pro',ram:8,dpi:400,screen:6.7,fps:60},
+      {name:'Realme 12 Pro+',ram:8,dpi:480,screen:6.7,fps:60},
+      {name:'Realme 12 Pro',ram:8,dpi:400,screen:6.7,fps:60},
+      {name:'Realme C67',ram:6,dpi:400,screen:6.72,fps:60},
+      {name:'Realme C55',ram:6,dpi:400,screen:6.72,fps:60},
+      {name:'Realme C53',ram:4,dpi:240,screen:6.74,fps:60},
+      {name:'Realme C35',ram:4,dpi:240,screen:6.6,fps:60},
+      {name:'Realme Narzo 70 Pro',ram:8,dpi:400,screen:6.67,fps:90},
+      {name:'Realme Narzo 60 Pro',ram:8,dpi:400,screen:6.7,fps:60},
+      {name:'Realme Narzo 50',ram:4,dpi:400,screen:6.6,fps:60},
+      {name:'Realme GT Neo 5',ram:8,dpi:400,screen:6.67,fps:90},
+      {name:'Realme GT Neo 3',ram:8,dpi:400,screen:6.7,fps:90},
+      {name:'Realme GT 2',ram:8,dpi:400,screen:6.62,fps:90},
+      {name:'Realme 10 Pro+',ram:8,dpi:400,screen:6.7,fps:60},
+      {name:'Realme 9 Pro+',ram:6,dpi:400,screen:6.4,fps:60},
+      {name:'Realme 9i',ram:4,dpi:240,screen:6.6,fps:60},
+      {name:'Realme 8 Pro',ram:6,dpi:400,screen:6.4,fps:60},
+      {name:'Realme 8',ram:4,dpi:400,screen:6.5,fps:60},
+      {name:'Realme C21Y',ram:3,dpi:240,screen:6.5,fps:30},
+      {name:'Realme P4 Pro',ram:12,dpi:400,screen:6.7,fps:144},
+      // POCO
+      {name:'Poco X6 Pro',ram:8,dpi:480,screen:6.67,fps:90},
+      {name:'Poco X6',ram:8,dpi:480,screen:6.67,fps:60},
+      {name:'Poco X5 Pro',ram:6,dpi:400,screen:6.67,fps:60},
+      {name:'Poco X5',ram:6,dpi:400,screen:6.67,fps:60},
+      {name:'Poco X4 Pro',ram:6,dpi:400,screen:6.67,fps:60},
+      {name:'Poco F6',ram:12,dpi:480,screen:6.67,fps:90},
+      {name:'Poco F5',ram:8,dpi:400,screen:6.67,fps:90},
+      {name:'Poco F4',ram:8,dpi:400,screen:6.67,fps:90},
+      {name:'Poco F3',ram:6,dpi:400,screen:6.67,fps:90},
+      {name:'Poco X3 Pro',ram:6,dpi:400,screen:6.67,fps:60},
+      {name:'Poco M6 Pro',ram:8,dpi:400,screen:6.67,fps:60},
+      {name:'Poco M6',ram:4,dpi:240,screen:6.79,fps:60},
+      {name:'Poco M5s',ram:6,dpi:400,screen:6.43,fps:60},
+      {name:'Poco M4 Pro',ram:4,dpi:400,screen:6.43,fps:60},
+      {name:'Poco C75',ram:6,dpi:240,screen:6.79,fps:60},
+      {name:'Poco C65',ram:4,dpi:240,screen:6.74,fps:60},
+      // OPPO
+      {name:'OPPO Reno 12 Pro',ram:12,dpi:480,screen:6.7,fps:90},
+      {name:'OPPO Reno 12',ram:8,dpi:400,screen:6.7,fps:60},
+      {name:'OPPO Reno 11 Pro',ram:12,dpi:480,screen:6.74,fps:90},
+      {name:'OPPO Reno 11',ram:8,dpi:400,screen:6.7,fps:60},
+      {name:'OPPO Reno 10 Pro+',ram:12,dpi:480,screen:6.7,fps:90},
+      {name:'OPPO Reno 10',ram:8,dpi:400,screen:6.7,fps:60},
+      {name:'OPPO A79',ram:8,dpi:400,screen:6.72,fps:60},
+      {name:'OPPO A78',ram:8,dpi:400,screen:6.56,fps:60},
+      {name:'OPPO A58',ram:8,dpi:400,screen:6.56,fps:60},
+      {name:'OPPO A38',ram:4,dpi:240,screen:6.56,fps:30},
+      {name:'OPPO A18',ram:4,dpi:240,screen:6.56,fps:60},
+      {name:'OPPO F25 Pro',ram:8,dpi:400,screen:6.67,fps:90},
+      {name:'OPPO Find X8 Pro',ram:16,dpi:560,screen:6.78,fps:120},
+      // Vivo
+      {name:'Vivo T3x',ram:8,dpi:400,screen:6.72,fps:60},
+      {name:'Vivo T3 Pro',ram:8,dpi:400,screen:6.78,fps:90},
+      {name:'Vivo T2 Pro',ram:8,dpi:400,screen:6.78,fps:60},
+      {name:'Vivo V30 Pro',ram:12,dpi:480,screen:6.78,fps:60},
+      {name:'Vivo V30e',ram:8,dpi:400,screen:6.78,fps:60},
+      {name:'Vivo Y200 Pro',ram:8,dpi:400,screen:6.67,fps:60},
+      {name:'Vivo Y200',ram:8,dpi:400,screen:6.67,fps:60},
+      {name:'Vivo Y100',ram:8,dpi:400,screen:6.64,fps:60},
+      {name:'Vivo Y58',ram:8,dpi:400,screen:6.67,fps:60},
+      {name:'Vivo Y27s',ram:6,dpi:240,screen:6.64,fps:60},
+      {name:'Vivo Y17s',ram:4,dpi:240,screen:6.56,fps:60},
+      {name:'Vivo Y16',ram:4,dpi:240,screen:6.51,fps:30},
+      {name:'Vivo V27 Pro',ram:8,dpi:400,screen:6.78,fps:60},
+      {name:'Vivo X90',ram:12,dpi:480,screen:6.78,fps:90},
+      // OnePlus
+      {name:'OnePlus 13',ram:16,dpi:560,screen:6.82,fps:120},
+      {name:'OnePlus 12',ram:16,dpi:560,screen:6.82,fps:120},
+      {name:'OnePlus Nord CE4',ram:8,dpi:400,screen:6.7,fps:60},
+      {name:'OnePlus Nord CE4 Lite',ram:8,dpi:400,screen:6.7,fps:60},
+      {name:'OnePlus Nord CE3',ram:8,dpi:400,screen:6.7,fps:60},
+      {name:'OnePlus Nord 3',ram:8,dpi:400,screen:6.74,fps:90},
+      {name:'OnePlus Nord 2T',ram:8,dpi:400,screen:6.43,fps:90},
+      {name:'OnePlus 12R',ram:8,dpi:400,screen:6.78,fps:90},
+      {name:'OnePlus 10R',ram:12,dpi:400,screen:6.7,fps:90},
+      {name:'OnePlus 10 Pro',ram:12,dpi:560,screen:6.7,fps:90},
+      {name:'OnePlus 9R',ram:8,dpi:400,screen:6.55,fps:90},
+      {name:'OnePlus Nord',ram:6,dpi:400,screen:6.44,fps:60},
+      // iPhone
+      {name:'iPhone 16 Pro Max',ram:8,dpi:480,screen:6.9,fps:120},
+      {name:'iPhone 16 Pro',ram:8,dpi:480,screen:6.3,fps:120},
+      {name:'iPhone 16',ram:8,dpi:480,screen:6.1,fps:120},
+      {name:'iPhone 15 Pro',ram:8,dpi:480,screen:6.1,fps:60},
+      {name:'iPhone 15',ram:6,dpi:480,screen:6.1,fps:60},
+      {name:'iPhone 14 Pro',ram:6,dpi:480,screen:6.1,fps:60},
+      {name:'iPhone 14',ram:6,dpi:480,screen:6.1,fps:60},
+      {name:'iPhone 13 Pro',ram:6,dpi:480,screen:6.1,fps:60},
+      {name:'iPhone 13',ram:4,dpi:480,screen:6.1,fps:60},
+      {name:'iPhone 12',ram:4,dpi:480,screen:6.1,fps:60},
+      {name:'iPhone 11',ram:4,dpi:320,screen:6.1,fps:60},
+      {name:'iPhone SE 2022',ram:4,dpi:320,screen:4.7,fps:60},
+      // Motorola
+      {name:'Motorola Edge 50 Fusion',ram:8,dpi:400,screen:6.7,fps:60},
+      {name:'Motorola Edge 50 Pro',ram:12,dpi:480,screen:6.7,fps:90},
+      {name:'Motorola G85',ram:8,dpi:400,screen:6.67,fps:60},
+      {name:'Motorola G64',ram:8,dpi:400,screen:6.5,fps:60},
+      {name:'Motorola G54',ram:8,dpi:400,screen:6.5,fps:60},
+      {name:'Motorola G34',ram:4,dpi:240,screen:6.5,fps:60},
+      {name:'Motorola G24',ram:4,dpi:240,screen:6.5,fps:60},
+      {name:'Motorola G14',ram:4,dpi:240,screen:6.5,fps:60},
+      // Infinix
+      {name:'Infinix GT 20 Pro',ram:8,dpi:400,screen:6.78,fps:90},
+      {name:'Infinix GT 10 Pro',ram:8,dpi:400,screen:6.67,fps:90},
+      {name:'Infinix Note 40 Pro',ram:8,dpi:400,screen:6.78,fps:60},
+      {name:'Infinix Note 40',ram:8,dpi:400,screen:6.78,fps:60},
+      {name:'Infinix Note 30',ram:8,dpi:400,screen:6.78,fps:60},
+      {name:'Infinix Hot 40 Pro',ram:8,dpi:240,screen:6.78,fps:60},
+      {name:'Infinix Hot 40i',ram:4,dpi:240,screen:6.56,fps:60},
+      {name:'Infinix Zero 30',ram:8,dpi:400,screen:6.78,fps:60},
+      {name:'Infinix Smart 8',ram:4,dpi:240,screen:6.6,fps:30},
+      {name:'Infinix Hot 30i',ram:4,dpi:240,screen:6.56,fps:30},
+      // Tecno
+      {name:'Tecno Pova 6 Pro',ram:8,dpi:400,screen:6.78,fps:90},
+      {name:'Tecno Spark 30 Pro',ram:8,dpi:400,screen:6.79,fps:60},
+      {name:'Tecno Spark 20 Pro+',ram:8,dpi:400,screen:6.78,fps:60},
+      {name:'Tecno Camon 30 Pro',ram:8,dpi:400,screen:6.78,fps:60},
+      {name:'Tecno Camon 20 Pro',ram:8,dpi:400,screen:6.67,fps:60},
+      {name:'Tecno Spark 20',ram:4,dpi:240,screen:6.56,fps:60},
+      {name:'Tecno Pop 8',ram:2,dpi:240,screen:6.6,fps:30},
+      // iQOO
+      {name:'iQOO 15',ram:12,dpi:480,screen:6.78,fps:144},
+      {name:'iQOO 15R',ram:8,dpi:400,screen:6.78,fps:120},
+      {name:'iQOO Neo 10',ram:12,dpi:480,screen:6.78,fps:144},
+      {name:'iQOO Neo 10R',ram:8,dpi:400,screen:6.78,fps:120},
+      {name:'iQOO Neo 9 Pro',ram:12,dpi:480,screen:6.78,fps:144},
+      {name:'iQOO Neo 8 Pro',ram:12,dpi:480,screen:6.78,fps:120},
+      {name:'iQOO 9',ram:12,dpi:400,screen:6.56,fps:120},
+      {name:'iQOO Z10',ram:8,dpi:400,screen:6.72,fps:120},
+      {name:'iQOO Z9 Pro',ram:8,dpi:400,screen:6.78,fps:120},
+      {name:'iQOO Z9s Pro',ram:8,dpi:480,screen:6.78,fps:120},
+      {name:'iQOO Z9 Lite',ram:6,dpi:400,screen:6.72,fps:90},
+      {name:'iQOO Z7 Pro',ram:8,dpi:480,screen:6.78,fps:90},
+      {name:'iQOO Z6 Pro',ram:8,dpi:400,screen:6.62,fps:90},
+      {name:'iQOO Z6 Lite',ram:4,dpi:400,screen:6.58,fps:60},
+      {name:'iQOO 8 Pro',ram:12,dpi:480,screen:6.78,fps:120},
+      {name:'iQOO 7 Legend',ram:8,dpi:400,screen:6.62,fps:120},
+      // Nothing
+      {name:'Nothing Phone 3',ram:12,dpi:400,screen:6.7,fps:120},
+      {name:'Nothing Phone 2a Plus',ram:12,dpi:400,screen:6.7,fps:120},
+      {name:'Nothing Phone 2a',ram:8,dpi:400,screen:6.7,fps:120},
+      {name:'Nothing Phone 2',ram:12,dpi:400,screen:6.7,fps:120},
+      {name:'Nothing Phone 1',ram:8,dpi:400,screen:6.55,fps:90},
+      // Google Pixel
+      {name:'Google Pixel 9 Pro',ram:16,dpi:560,screen:6.3,fps:120},
+      {name:'Google Pixel 9',ram:12,dpi:480,screen:6.3,fps:120},
+      {name:'Google Pixel 8 Pro',ram:12,dpi:480,screen:6.7,fps:120},
+      {name:'Google Pixel 8',ram:8,dpi:480,screen:6.2,fps:120},
+      {name:'Google Pixel 7 Pro',ram:12,dpi:560,screen:6.7,fps:120},
+      {name:'Google Pixel 7',ram:8,dpi:480,screen:6.3,fps:90},
+      {name:'Google Pixel 6 Pro',ram:12,dpi:560,screen:6.7,fps:120},
+      {name:'Google Pixel 6a',ram:6,dpi:480,screen:6.1,fps:60},
+      // Lava
+      {name:'Lava Blaze Curve 5G',ram:8,dpi:400,screen:6.67,fps:60},
+      {name:'Lava Storm Pro',ram:8,dpi:400,screen:6.67,fps:60},
+      {name:'Lava Blaze 2 5G',ram:6,dpi:240,screen:6.5,fps:60},
+      {name:'Lava Agni 2',ram:8,dpi:400,screen:6.78,fps:60},
+      {name:'Lava O2',ram:4,dpi:240,screen:6.5,fps:60},
+      {name:'Lava Yuva 3 Pro',ram:4,dpi:240,screen:6.5,fps:60},
+      // Xiaomi
+      {name:'Xiaomi 14 Pro',ram:16,dpi:560,screen:6.73,fps:120},
+      {name:'Xiaomi 14',ram:12,dpi:400,screen:6.36,fps:120},
+      {name:'Xiaomi 13T Pro',ram:12,dpi:400,screen:6.67,fps:144},
+      {name:'Xiaomi 13T',ram:8,dpi:400,screen:6.67,fps:144},
+      {name:'Xiaomi 12 Pro',ram:12,dpi:560,screen:6.73,fps:120},
+      {name:'Xiaomi 12',ram:8,dpi:480,screen:6.28,fps:120},
+      {name:'Xiaomi 11T Pro',ram:8,dpi:400,screen:6.67,fps:120},
+      {name:'Xiaomi 11i',ram:8,dpi:400,screen:6.67,fps:90}
+    ];
+
+    var autocompleteMatches = [];
+    var selectedAutocompleteIdx = -1;
+
+    function onPhoneModelInput(val) {
+      var list = document.getElementById('autocompleteListGen');
+      if (!val.trim()) {
+        list.style.display = 'none';
+        list.innerHTML = '';
+        autocompleteMatches = [];
+        selectedAutocompleteIdx = -1;
+        return;
+      }
+      var lower = val.toLowerCase();
+      autocompleteMatches = phoneDatabase.filter(function(p) { return p.name.toLowerCase().indexOf(lower) !== -1; });
+      if (autocompleteMatches.length === 0) {
+        list.style.display = 'none';
+        list.innerHTML = '';
+        selectedAutocompleteIdx = -1;
+        return;
+      }
+      list.innerHTML = '';
+      autocompleteMatches.forEach(function(p, idx) {
+        var item = document.createElement('div');
+        item.className = 'ac-item-gen';
+        item.textContent = p.name;
+        item.onclick = function() { selectPhone(p); };
+        list.appendChild(item);
+      });
+      list.style.display = 'block';
+      selectedAutocompleteIdx = -1;
+    }
+
+    function onPhoneModelEnter() {
+      if (selectedAutocompleteIdx >= 0 && selectedAutocompleteIdx < autocompleteMatches.length) {
+        selectPhone(autocompleteMatches[selectedAutocompleteIdx]);
+      } else if (autocompleteMatches.length > 0) {
+        selectPhone(autocompleteMatches[0]);
+      }
+    }
+
+    function selectPhone(phone) {
+      document.getElementById('phoneModelInput').value = phone.name;
+      document.getElementById('ram').value = phone.ram;
+      document.getElementById('dpi').value = phone.dpi;
+      document.getElementById('screen').value = phone.screen;
+      document.getElementById('fps').value = phone.fps;
+      ['ram','dpi','screen','fps'].forEach(function(id) {
+        var el = document.getElementById(id);
+        el.classList.add('auto-filled');
+        var badge = document.getElementById(id + 'Badge');
+        if (badge) badge.style.display = 'inline-block';
+      });
+      document.getElementById('detectedDeviceInfo').classList.add('show');
+      document.getElementById('detectedDeviceName').textContent = phone.name;
+      document.getElementById('autocompleteListGen').style.display = 'none';
+      autocompleteMatches = [];
+      selectedAutocompleteIdx = -1;
+    }
+
+    function autoDetect() {
+      // Calculate actual physical DPI using devicePixelRatio and screen resolution
+      var dpr = window.devicePixelRatio || 1;
+      var physDpi = Math.round(dpr * 160);
+
+      // Calculate physical screen diagonal in inches
+      var screenW = window.screen.width;
+      var screenH = window.screen.height;
+      var physW = screenW * dpr;
+      var physH = screenH * dpr;
+      var diag = Math.sqrt(physW * physW + physH * physH);
+      var screenInch = diag / physDpi;
+      screenInch = Math.round(screenInch * 10) / 10;
+      if (screenInch < 5.5) screenInch = 5.5;
+      if (screenInch > 6.9) screenInch = 6.9;
+      var closestScreen = [5.5, 6, 6.5, 6.7, 6.9].reduce(function(prev, curr) {
+        return Math.abs(curr - screenInch) < Math.abs(prev - screenInch) ? curr : prev;
+      });
+
+      // Map DPI to nearest dropdown option
+      var dpiVal = physDpi > 560 ? 640 : physDpi > 480 ? 560 : physDpi > 400 ? 480 : physDpi > 320 ? 400 : physDpi > 240 ? 320 : 240;
+      document.getElementById('dpi').value = dpiVal;
+      document.getElementById('screen').value = closestScreen;
+
+      // RAM detection via Navigator API
+      var nav = navigator;
+      var memGb = nav.deviceMemory || 4;
+      document.getElementById('ram').value = memGb >= 12 ? 12 : memGb >= 8 ? 8 : memGb >= 6 ? 6 : memGb >= 4 ? 4 : memGb >= 3 ? 3 : 2;
+
+      // FPS / Refresh rate detection
+      var hz = 60;
+      if (window.screen && window.screen.refreshRate) { hz = window.screen.refreshRate; }
+      else if (window.screen && window.screen.displayFrequency) { hz = window.screen.displayFrequency; }
+      // Android Chrome exposes hz via CSS media query
+      var mq120 = window.matchMedia && window.matchMedia('(min-resolution: 1dppx) and (update: fast)');
+      document.getElementById('fps').value = hz >= 120 ? 120 : hz >= 90 ? 90 : hz >= 60 ? 60 : 30;
+
+      ['dpi','screen','ram','fps'].forEach(function(id) {
+        var el = document.getElementById(id);
+        el.classList.add('auto-filled');
+        var badge = document.getElementById(id + 'Badge');
+        if (badge) badge.style.display = 'inline-block';
+      });
+      document.getElementById('detectedDeviceInfo').classList.add('show');
+      document.getElementById('detectedDeviceName').textContent = 'Your Device (Auto-Detected: ' + dpiVal + ' DPI, ' + closestScreen + '" screen, ' + memGb + 'GB RAM)';
+    }
+
+    function generateSens() {
+      var ram = parseInt(document.getElementById('ram').value);
+      var dpi = parseInt(document.getElementById('dpi').value);
+      var screen = parseFloat(document.getElementById('screen').value);
+      var fps = parseInt(document.getElementById('fps').value);
+      var playstyle = document.getElementById('playstyle').value;
+      var headset = document.getElementById('headset').value;
+
+      if (!ram || !dpi || !screen || !fps || !playstyle) {
+        showValidationError();
+        return;
+      }
+
+      var overlay = document.getElementById('generatingOverlay');
+      var placeholder = document.getElementById('outputPlaceholder');
+      var result = document.getElementById('outputResult');
+
+      placeholder.classList.add('hidden');
+      result.classList.add('hidden');
+      overlay.classList.add('show');
+
+      setTimeout(function() {
+        overlay.classList.remove('show');
+        result.classList.remove('hidden');
+        var sensValues = calculateSensitivity(ram, dpi, screen, fps, playstyle, selectedSensLevel);
+        displaySensitivity(sensValues, ram, fps, playstyle, headset);
+      }, 1500);
+    }
+
+    function calculateSensitivity(ram, dpi, screen, fps, playstyle, level) {
+      var base = 100;
+      
+      // Adjust for sens level
+      var levelMult = 1.0;
+      if (level === 'low') levelMult = 0.75;
+      else if (level === 'high') levelMult = 1.2;
+      
+      // RAM adjustment
+      if (ram <= 3) base = 80 * levelMult;
+      else if (ram === 4) base = 95 * levelMult;
+      else if (ram === 6) base = 110 * levelMult;
+      else if (ram >= 8) base = 125 * levelMult;
+
+      // DPI adjustment
+      var dpiMult = 1 + (dpi - 320) / 800;
+      base *= dpiMult;
+
+      // Screen size adjustment
+      var screenMult = 1 + (screen - 6) / 15;
+      base *= screenMult;
+
+      // FPS adjustment
+      if (fps === 30) base *= 0.9;
+      else if (fps === 90) base *= 1.08;
+      else if (fps >= 120) base *= 1.15;
+
+      // Playstyle adjustment
+      var general, redDot, scope2x, scope4x, awm, freeLook;
+      if (playstyle === 'rush') {
+        general = Math.round(base * 1.2);
+        redDot = Math.round(base * 1.06);
+        scope2x = Math.round(base * 0.96);
+        scope4x = Math.round(base * 0.8);
+        awm = Math.round(base * 0.5);
+        freeLook = Math.round(base * 1.15);
+      } else if (playstyle === 'sniper') {
+        general = Math.round(base * 0.85);
+        redDot = Math.round(base * 0.75);
+        scope2x = Math.round(base * 0.68);
+        scope4x = Math.round(base * 0.52);
+        awm = Math.round(base * 0.32);
+        freeLook = Math.round(base * 0.95);
+      } else {
+        general = Math.round(base * 1.1);
+        redDot = Math.round(base * 0.95);
+        scope2x = Math.round(base * 0.85);
+        scope4x = Math.round(base * 0.68);
+        awm = Math.round(base * 0.42);
+        freeLook = Math.round(base * 1.1);
+      }
+
+      // Cap values at reasonable ranges
+      general = Math.min(180, Math.max(50, general));
+      redDot = Math.min(160, Math.max(40, redDot));
+      scope2x = Math.min(140, Math.max(35, scope2x));
+      scope4x = Math.min(120, Math.max(30, scope4x));
+      awm = Math.min(95, Math.max(20, awm));
+      freeLook = Math.min(175, Math.max(45, freeLook));
+
+      return {
+        general: general,
+        redDot: redDot,
+        scope2x: scope2x,
+        scope4x: scope4x,
+        awm: awm,
+        freeLook: freeLook
+      };
+    }
+
+    function displaySensitivity(result, ram, fps, playstyle, headset) {
+      var out = document.getElementById('outputResult');
+
+      setValueAnimated('sensGeneral', 'barGeneral', result.general);
+      setValueAnimated('sensRedDot', 'barRedDot', result.redDot);
+      setValueAnimated('sens2x', 'bar2x', result.scope2x);
+      setValueAnimated('sens4x', 'bar4x', result.scope4x);
+      setValueAnimated('sensAWM', 'barAWM', result.awm);
+      setValueAnimated('sensFreeLook', 'barFreeLook', result.freeLook);
+
+      var tips = generateTips(ram, fps, playstyle, headset, result, selectedSensLevel);
+      var tl = document.getElementById('tipsList');
+      tl.innerHTML = '';
+      tips.forEach(function(t) { var li = document.createElement('li'); li.textContent = t; tl.appendChild(li); });
+
+      if (window.innerWidth < 900) {
+        setTimeout(function() { out.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 300);
+      }
+    }
+
+    function setValueAnimated(vid, bid, value) {
+      var el = document.getElementById(vid);
+      var bar = document.getElementById(bid);
+      var startTime = null;
+      var dur = 700;
+      function step(ts) {
+        if (!startTime) startTime = ts;
+        var prog = Math.min((ts - startTime) / dur, 1);
+        var eased = 1 - Math.pow(1 - prog, 3);
+        el.textContent = Math.round(eased * value);
+        if (prog < 1) requestAnimationFrame(step);
+        else el.textContent = value;
+      }
+      requestAnimationFrame(step);
+      setTimeout(function() { bar.style.width = (value/2) + '%'; }, 100);
+    }
+
+    function generateTips(ram, fps, playstyle, headset, result, level) {
+      var tips = [];
+      
+      // Level-specific tips
+      if (level === 'low') {
+        tips.push('Low sensitivity selected - perfect for precise aiming and steady shots.');
+        tips.push('Take your time with each shot. Low sens rewards patience and accuracy.');
+      } else if (level === 'high') {
+        tips.push('High sensitivity selected - ideal for quick flicks and fast-paced gameplay.');
+        tips.push('Practice 180° turns in Training Mode to master high sensitivity control.');
+      } else {
+        tips.push('Medium sensitivity - the sweet spot between speed and precision.');
+      }
+      
+      if (playstyle === 'rush') {
+        tips.push('High General sensitivity (' + result.general + ') is ideal for fast 180° flicks in close combat.');
+        tips.push('Keep crosshair at head level while rushing for quick headshots.');
+      } else if (playstyle === 'sniper') {
+        tips.push('Low AWM Scope (' + result.awm + ') gives precision for long-range one-shots.');
+        tips.push('Go prone or crouch before scoping for maximum accuracy.');
+      }
+      
+      if (ram <= 3) {
+        tips.push('Low RAM: Set graphics to Lowest and FPS to 30 for smooth gameplay.');
+      } else if (ram >= 6) {
+        tips.push('High RAM: You can enable 90+ FPS mode for extra smooth aiming!');
+      }
+      
+      if (fps === 30) tips.push('At 30 FPS, tap fire for better headshot accuracy — avoid spraying.');
+      else if (fps >= 90) tips.push(fps + ' FPS gives reaction advantage — use it to pre-aim corners!');
+      
+      if (headset === 'yes') tips.push('With headset: max out footstep volume. Hear enemies before seeing them!');
+      else tips.push('Get earphones — hearing footsteps gives a HUGE competitive advantage.');
+      
+      tips.push('After applying, go to Training Mode and practice for 15 mins before ranked.');
+      return tips.slice(0, 5);
+    }
+
+    function copySensitivity() {
+      var general = document.getElementById('sensGeneral').textContent;
+      var redDot = document.getElementById('sensRedDot').textContent;
+      var s2x = document.getElementById('sens2x').textContent;
+      var s4x = document.getElementById('sens4x').textContent;
+      var awm = document.getElementById('sensAWM').textContent;
+      var freeLook = document.getElementById('sensFreeLook').textContent;
+      
+      var levelName = selectedSensLevel.charAt(0).toUpperCase() + selectedSensLevel.slice(1);
+      
+      var rows = [
+        ['General', general],
+        ['Red Dot', redDot],
+        ['2x Scope', s2x],
+        ['4x Scope', s4x],
+        ['AWM Scope', awm],
+        ['Free Look', freeLook]
+      ];
+      var text = ['FF SENSI PRO - ' + levelName.toUpperCase() + ' MODE', '--------------------------------'];
+      rows.forEach(function(row) {
+        text.push(padRight(row[0], 10) + ' : ' + row[1]);
+      });
+      text.push('--------------------------------');
+      text.push('Tip: Practice 10 mins in training mode.');
+      text = text.join('\n');
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(showCopyToast).catch(function() { fallbackCopy(text); });
+      } else { fallbackCopy(text); }
+    }
+
+    function fallbackCopy(text) {
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      try { document.execCommand('copy'); } catch(e){}
+      document.body.removeChild(ta); showCopyToast();
+    }
+
+    function showCopyToast() {
+      var t = document.getElementById('copyToast');
+      if (!t) return;
+      t.classList.remove('hidden');
+      setTimeout(function() { t.classList.add('hidden'); }, 2500);
+    }
+
+    function padRight(label, len) {
+      while (label.length < len) label += ' ';
+      return label;
+    }
+
+    function updateDisplayValues(values) {
+      setValueAnimated('sensGeneral', 'barGeneral', values.general);
+      setValueAnimated('sensRedDot', 'barRedDot', values.redDot);
+      setValueAnimated('sens2x', 'bar2x', values.scope2x);
+      setValueAnimated('sens4x', 'bar4x', values.scope4x);
+      setValueAnimated('sensAWM', 'barAWM', values.awm);
+      setValueAnimated('sensFreeLook', 'barFreeLook', values.freeLook);
+    }
+
+    function applyHeadshotBoost() {
+      var current = {
+        general: parseInt(document.getElementById('sensGeneral').textContent || '0', 10),
+        redDot: parseInt(document.getElementById('sensRedDot').textContent || '0', 10),
+        scope2x: parseInt(document.getElementById('sens2x').textContent || '0', 10),
+        scope4x: parseInt(document.getElementById('sens4x').textContent || '0', 10),
+        awm: parseInt(document.getElementById('sensAWM').textContent || '0', 10),
+        freeLook: parseInt(document.getElementById('sensFreeLook').textContent || '0', 10)
+      };
+      if (!current.general) return;
+      current.general = Math.min(180, current.general + 4);
+      current.redDot = Math.min(160, current.redDot + 5);
+      current.scope2x = Math.min(140, current.scope2x + 3);
+      current.freeLook = Math.min(175, current.freeLook + 3);
+      updateDisplayValues(current);
+      document.getElementById('copyToast').textContent = '🔥 Headshot Boost applied';
+      showCopyToast();
+      setTimeout(function(){document.getElementById('copyToast').textContent='✅ Sensitivity Copied to Clipboard!';}, 1800);
+    }
+
+    function applyStabilityTune() {
+      var current = {
+        general: parseInt(document.getElementById('sensGeneral').textContent || '0', 10),
+        redDot: parseInt(document.getElementById('sensRedDot').textContent || '0', 10),
+        scope2x: parseInt(document.getElementById('sens2x').textContent || '0', 10),
+        scope4x: parseInt(document.getElementById('sens4x').textContent || '0', 10),
+        awm: parseInt(document.getElementById('sensAWM').textContent || '0', 10),
+        freeLook: parseInt(document.getElementById('sensFreeLook').textContent || '0', 10)
+      };
+      if (!current.general) return;
+      current.general = Math.max(50, current.general - 4);
+      current.redDot = Math.max(40, current.redDot - 5);
+      current.scope2x = Math.max(35, current.scope2x - 4);
+      current.scope4x = Math.max(30, current.scope4x - 3);
+      updateDisplayValues(current);
+      document.getElementById('copyToast').textContent = '🛡️ Stability Tune applied';
+      showCopyToast();
+      setTimeout(function(){document.getElementById('copyToast').textContent='✅ Sensitivity Copied to Clipboard!';}, 1800);
+    }
+
+    function resetForm() {
+      ['ram','dpi','screen','fps','playstyle'].forEach(function(id) { document.getElementById(id).value = ''; });
+      document.getElementById('headset').value = 'no';
+      document.getElementById('phoneModelInput').value = '';
+      document.getElementById('outputPlaceholder').classList.remove('hidden');
+      document.getElementById('outputResult').classList.add('hidden');
+      document.getElementById('detectedDeviceInfo').classList.remove('show');
+      ['ram','dpi','screen','fps'].forEach(function(id) {
+        document.getElementById(id).classList.remove('auto-filled');
+        var badge = document.getElementById(id + 'Badge');
+        if (badge) badge.style.display = 'none';
+      });
+      // Reset to medium level
+      selectedSensLevel = 'medium';
+      document.querySelectorAll('.sens-level-btn').forEach(function(btn) {
+        btn.classList.remove('active');
+        if (btn.dataset.level === 'medium') btn.classList.add('active');
+      });
+    }
+
+    function showValidationError() {
+      var placeholder = document.getElementById('outputPlaceholder');
+      placeholder.innerHTML = '<div class="placeholder-icon">⚠️</div><p style="color:#ff3366;font-weight:700;font-size:1.1rem;">Please fill in all fields before generating!</p>';
+      setTimeout(function() {
+        placeholder.innerHTML = '<div class="placeholder-icon">🎮</div><p>Enter your details and click Generate to see your custom sensitivity settings!</p>';
+      }, 2500);
+    }
+
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('#phoneModelInput') && !e.target.closest('#autocompleteListGen')) {
+        document.getElementById('autocompleteListGen').style.display = 'none';
+      }
+    });
+  </script>
+  <script>
+    // Auth guard — require login + subscribed
+    (function() {
+      try {
+        var sess = JSON.parse(localStorage.getItem('ffsp_session') || 'null');
+        if (!sess || !sess.loggedIn || !sess.subscribed) {
+          window.location.replace('login.html');
+          return;
+        }
+        document.body.style.visibility = 'visible';
+        var nameEl = document.getElementById('userNameDisplay');
+        if (nameEl) nameEl.textContent = sess.username || 'Player';
+      } catch(e) {
+        window.location.replace('login.html');
+      }
+    })();
+
+    function doLogout(evt) {
+      if (evt) {
+        evt.preventDefault();
+        evt.stopPropagation();
+      }
+      
+      try {
+        localStorage.clear();
+        sessionStorage.clear();
+        localStorage.removeItem('ffsp_session');
+        sessionStorage.removeItem('ffsp_session');
+        document.cookie.split(";").forEach(function(c) { 
+          document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+        });
+      } catch(e) {
+        console.error('Logout error:', e);
+      }
+      
+      setTimeout(function() { window.location.replace('login.html'); }, 50);
+    }
+
+    // Mobile nav
+    document.addEventListener('DOMContentLoaded', function() {
+      var toggle = document.getElementById('navToggle');
+      var links = document.getElementById('navLinks');
+      if (toggle && links) {
+        toggle.addEventListener('click', function() { links.classList.toggle('open'); });
+        links.querySelectorAll('a').forEach(function(a) {
+          a.addEventListener('click', function() { links.classList.remove('open'); });
+        });
+      }
+    });
+  </script>
+  <style>
+    .autocomplete-list-gen {
+      position: absolute;
+      left: 0; right: 0;
+      top: calc(100% + 4px);
+      background: #161b2e;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      max-height: 240px;
+      overflow-y: auto;
+      z-index: 999;
+      display: none;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    }
+    .ac-item-gen {
+      padding: 0.7rem 1rem;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      transition: background 0.15s;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .ac-item-gen:hover { background: rgba(255,107,0,0.12); }
+    .ac-item-gen:last-child { border-bottom: none; }
+  </style>
+</body>
+</html>

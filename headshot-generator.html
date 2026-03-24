@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Headshot Generator - FF Sens Pro</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-logo"><span>FF<span class="accent">Sens</span>Pro</span></div>
+    <div class="nav-toggle" id="navToggle">&#9776;</div>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="generator.html">Generator</a></li>
+      <li><a href="headshot-generator.html" class="active">🎯 Headshot Gen</a></li>
+      <li><a href="best-sensitivity.html">Best Sens</a></li>
+      <li><a href="sensi-by-phone.html">📱 Sensi by Phone</a></li>
+      <li><a href="pc-sensi.html">🖥️ PC Sensi</a></li>
+      <li><a href="lag-fix.html">Lag Fix</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+  </nav>
+
+  <div class="page-header">
+    <h1>🎯 <span class="accent">Headshot Generator</span></h1>
+    <p>Generate aggressive but controlled settings for better headshots</p>
+  </div>
+
+  <section class="generator-section">
+    <div class="container">
+      <div class="generator-wrapper">
+        <div class="gen-form-card">
+          <h2>⚙️ Headshot Profile Inputs</h2>
+          
+  
+
+          <!-- AUTO DETECT -->
+          <div style="background:linear-gradient(135deg,rgba(0,200,255,0.1),rgba(255,107,0,0.08));border:1px solid var(--border-blue);border-radius:12px;padding:1rem 1.4rem;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:0.7rem;">
+              <span style="font-size:1.4rem">🔎</span>
+              <div>
+                <div style="color:var(--blue);font-weight:700;font-size:0.9rem">Auto-Detect Device</div>
+                <div style="color:var(--text-muted);font-size:0.78rem">Auto-fill all fields from your device</div>
+              </div>
+            </div>
+            <button onclick="hAutoDetect()" style="background:linear-gradient(135deg,var(--blue),#0066aa);border:none;color:#fff;padding:0.6rem 1.3rem;border-radius:8px;font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;letter-spacing:1px;cursor:pointer;white-space:nowrap;">AUTO DETECT</button>
+          </div>
+          <div id="hDetectedInfo" style="display:none;background:rgba(0,200,255,0.06);border:1px solid var(--border-blue);border-radius:8px;padding:0.6rem 1rem;margin-bottom:0.8rem;font-size:0.82rem;color:var(--text-muted)">Detected: <strong id="hDetectedName" style="color:var(--blue)"></strong></div>
+
+          <div class="form-group"><label>RAM</label><select id="hram"><option value="">Select</option><option>2</option><option>3</option><option>4</option><option>6</option><option>8</option><option>12</option></select></div>
+          <div class="form-group"><label>DPI</label><select id="hdpi"><option value="">Select</option><option>240</option><option>320</option><option>400</option><option>480</option><option>560</option><option>640</option></select></div>
+          <div class="form-group"><label>Screen Size</label><select id="hscreen"><option value="">Select</option><option value="5.5">5.5</option><option value="6">6</option><option value="6.5">6.5</option><option value="6.7">6.7</option><option value="6.9">6.9+</option></select></div>
+          <div class="form-group"><label>FPS</label><select id="hfps"><option value="">Select</option><option>30</option><option>60</option><option>90</option><option>120</option></select></div>
+          <div class="form-group"><label>Play Style</label><select id="hstyle"><option value="">Select</option><option value="rush">Rush</option><option value="balanced">Balanced</option><option value="sniper">Sniper</option></select></div>
+          <div class="form-group"><label>Control Preference</label><select id="hcontrol"><option value="aggressive">Aggressive Flick</option><option value="balanced">Balanced Control</option><option value="stable">Stable Drag</option></select></div>
+          <button class="btn-generate" onclick="generateHeadshot()">🚀 Generate Headshot Set</button>
+          <button class="btn-reset" onclick="resetHeadshot()">🔄 Reset</button>
+        </div>
+
+        <div class="gen-output-card">
+          <div id="hPlaceholder" class="output-placeholder">
+            <div class="placeholder-icon">🎯</div>
+            <p>Fill inputs and generate your headshot-focused sensitivity.</p>
+          </div>
+          <div id="hResult" class="output-result hidden">
+            <h2>🔥 Headshot Settings</h2>
+            <div class="sens-item"><div class="sens-label">General</div><div class="sens-value" id="hg">0</div><div class="sens-bar"><div class="sens-bar-fill" id="hbg"></div></div></div>
+            <div class="sens-item"><div class="sens-label">Red Dot</div><div class="sens-value" id="hrd">0</div><div class="sens-bar"><div class="sens-bar-fill" id="hbrd"></div></div></div>
+            <div class="sens-item"><div class="sens-label">2x Scope</div><div class="sens-value" id="h2x">0</div><div class="sens-bar"><div class="sens-bar-fill" id="hb2x"></div></div></div>
+            <div class="sens-item"><div class="sens-label">4x Scope</div><div class="sens-value" id="h4x">0</div><div class="sens-bar"><div class="sens-bar-fill" id="hb4x"></div></div></div>
+            <div class="sens-item"><div class="sens-label">AWM Scope</div><div class="sens-value" id="hawm">0</div><div class="sens-bar"><div class="sens-bar-fill" id="hbawm"></div></div></div>
+            <div class="sens-item"><div class="sens-label">Free Look</div><div class="sens-value" id="hfl">0</div><div class="sens-bar"><div class="sens-bar-fill" id="hbfl"></div></div></div>
+            <button class="btn-copy-sens" onclick="copyHeadshot()">📋 Copy Settings</button>
+            <div class="tips-section">
+              <h3>💡 Headshot Plan</h3>
+              <ul id="hTips"></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="copy-toast hidden" id="hToast">✅ Headshot settings copied!</div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-logo">FF<span class="accent">Sens</span>Pro</div>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="generator.html">Generator</a>
+        <a href="headshot-generator.html">🎯 Headshot Gen</a>
+        <a href="best-sensitivity.html">Best Sens</a>
+        <a href="sensi-by-phone.html">📱 Sensi by Phone</a>
+        <a href="pc-sensi.html">🖥️ PC Sensi</a>
+        <a href="lag-fix.html">Lag Fix</a>
+        <a href="about.html">About</a>
+      </div>
+      <p class="copy">© 2024 FFSensPro. Not affiliated with Garena Free Fire.</p>
+    </div>
+  </footer>
+
+  <script>
+function clamp(v,min,max){return Math.min(max,Math.max(min,v));}
+function setVal(id,barId,val){
+  document.getElementById(id).textContent=val;
+  document.getElementById(barId).style.width=(val/2)+'%';
+}
+
+function generateHeadshot(){
+  var ram=parseInt(document.getElementById('hram').value,10);
+  var dpi=parseInt(document.getElementById('hdpi').value,10);
+  var screen=parseFloat(document.getElementById('hscreen').value);
+  var fps=parseInt(document.getElementById('hfps').value,10);
+  var style=document.getElementById('hstyle').value;
+  var control=document.getElementById('hcontrol').value;
+  if(!ram||!dpi||!screen||!fps||!style){return;}
+
+  var base=108;
+  base*=1+((dpi-320)/900);
+  base*=1+((screen-6)/18);
+
+  if(ram<=3) base*=0.86;
+  else if(ram>=8) base*=1.08;
+
+  if(fps>=90) base*=1.06;
+  if(style==='rush') base*=1.08;
+  else if(style==='sniper') base*=0.9;
+
+  if(control==='stable') base*=0.92;
+  else if(control==='aggressive') base*=1.06;
+
+  var vals={
+    g:clamp(Math.round(base*1.12),50,200),
+    rd:clamp(Math.round(base*1.02),45,200),
+    x2:clamp(Math.round(base*0.9),35,180),
+    x4:clamp(Math.round(base*0.73),30,160),
+    awm:clamp(Math.round(base*0.48),20,120),
+    fl:clamp(Math.round(base*1.06),45,200)
+  };
+
+  document.getElementById('hPlaceholder').classList.add('hidden');
+  document.getElementById('hResult').classList.remove('hidden');
+
+  setVal('hg','hbg',vals.g);
+  setVal('hrd','hbrd',vals.rd);
+  setVal('h2x','hb2x',vals.x2);
+  setVal('h4x','hb4x',vals.x4);
+  setVal('hawm','hbawm',vals.awm);
+  setVal('hfl','hbfl',vals.fl);
+
+  document.getElementById('hTips').innerHTML=[
+    'Drag shot: swipe up short and fast, not long swipe.',
+    'Daily 10-minute training mode with Red Dot only.',
+    'Keep crosshair chest level while moving.',
+    'After 3 matches, fine tune Red Dot by +/-3.'
+  ].map(function(t){return '<li>'+t+'</li>';}).join('');
+}
+
+function resetHeadshot(){
+  ['hram','hdpi','hscreen','hfps','hstyle'].forEach(function(id){
+    document.getElementById(id).value='';
+  });
+  document.getElementById('hcontrol').value='aggressive';
+  document.getElementById('hResult').classList.add('hidden');
+  document.getElementById('hPlaceholder').classList.remove('hidden');
+  document.getElementById('hDetectedInfo').style.display='none';
+}
+
+/* PERFECT AUTO DETECT */
+function hAutoDetect() {
+  var dpr = window.devicePixelRatio || 1;
+  var dpi = Math.round(dpr * 160);
+
+  var ram = navigator.deviceMemory || 4;
+  var fps = 60;
+
+  if (ram >= 8) fps = 90;
+  if (ram >= 12) fps = 120;
+
+  var screen = 6.5;
+
+  document.getElementById('hram').value = ram >= 8 ? 8 : ram >= 6 ? 6 : ram >= 4 ? 4 : 3;
+  document.getElementById('hdpi').value = dpi >= 560 ? 560 : dpi >= 480 ? 480 : dpi >= 400 ? 400 : 320;
+  document.getElementById('hscreen').value = screen;
+  document.getElementById('hfps').value = fps;
+
+  document.getElementById('hDetectedName').textContent =
+    'Auto Detected — ' + dpi + ' DPI, ' + ram + 'GB RAM, ' + fps + ' FPS';
+
+  document.getElementById('hDetectedInfo').style.display = 'block';
+}
+
+function copyHeadshot(){
+  var text=[
+    'FF HEADSHOT SETTINGS',
+    'General: '+document.getElementById('hg').textContent,
+    'Red Dot: '+document.getElementById('hrd').textContent,
+    '2x Scope: '+document.getElementById('h2x').textContent,
+    '4x Scope: '+document.getElementById('h4x').textContent,
+    'AWM Scope: '+document.getElementById('hawm').textContent,
+    'Free Look: '+document.getElementById('hfl').textContent
+  ].join('\n');
+
+  navigator.clipboard.writeText(text);
+
+  var t=document.getElementById('hToast');
+  t.classList.remove('hidden');
+  setTimeout(function(){t.classList.add('hidden');},1800);
+}
+</script>
+  <script>(function(){try{var s=JSON.parse(localStorage.getItem("ffsp_session")||"null");if(!s||!s.loggedIn||!s.subscribed){localStorage.removeItem("ffsp_session");sessionStorage.clear();window.location.replace("login.html");}}catch(e){localStorage.removeItem("ffsp_session");sessionStorage.clear();window.location.replace("login.html");}})();</script>
+  <script src="main.js"></script>
+</body>
+</html>

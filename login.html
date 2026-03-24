@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - FF Sens Pro</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    .auth-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;position:relative;overflow:hidden;}
+    .auth-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 60% at 30% 40%,rgba(255,107,0,.13) 0%,transparent 70%),radial-gradient(ellipse 50% 50% at 80% 70%,rgba(0,200,255,.09) 0%,transparent 70%);pointer-events:none;}
+    .auth-bg::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,107,0,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,107,0,.04) 1px,transparent 1px);background-size:40px 40px;}
+    .auth-container{position:relative;z-index:2;width:100%;max-width:460px;}
+    .auth-logo{text-align:center;margin-bottom:2rem;}
+    .auth-logo a{font-family:'Orbitron',monospace;font-size:2rem;font-weight:900;color:var(--text);text-decoration:none;letter-spacing:3px;}
+    .auth-logo p{color:var(--text-muted);font-size:.9rem;margin-top:.4rem;}
+    .auth-card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:2.5rem;box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 40px rgba(255,107,0,.05);}
+    .step-section{display:none;flex-direction:column;gap:1.4rem;}
+    .step-section.active{display:flex;}
+    .step-title{text-align:center;font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;color:var(--text);letter-spacing:1px;}
+    .step-sub{text-align:center;color:var(--text-muted);font-size:.85rem;margin-top:-.6rem;}
+    .auth-divider{display:flex;align-items:center;gap:1rem;color:var(--text-muted);font-size:.85rem;}
+    .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+    .auth-tabs{display:flex;background:var(--bg-dark);border-radius:10px;padding:4px;border:1px solid var(--border);}
+    .auth-tab{flex:1;padding:.6rem;background:none;border:none;color:var(--text-muted);font-family:'Orbitron',monospace;font-size:.78rem;font-weight:700;letter-spacing:1px;cursor:pointer;border-radius:7px;transition:all .3s;}
+    .auth-tab.active{background:var(--accent);color:#fff;box-shadow:0 4px 15px rgba(255,107,0,.4);}
+    .form-section{display:none;flex-direction:column;gap:1.2rem;}
+    .form-section.active{display:flex;}
+    .auth-form-group{display:flex;flex-direction:column;gap:.5rem;}
+    .auth-form-group label{font-size:.85rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;}
+    .auth-input-wrap{position:relative;}
+    .input-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:1.1rem;pointer-events:none;}
+    .auth-form-group input{width:100%;background:var(--bg-dark);border:1px solid var(--border);border-radius:10px;padding:.85rem 1rem .85rem 2.8rem;color:var(--text);font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:500;transition:all .2s;outline:none;}
+    .auth-form-group input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,107,0,.15);}
+    .auth-form-group input::placeholder{color:var(--text-muted);opacity:.6;}
+    .auth-btn{width:100%;padding:1rem;background:linear-gradient(135deg,var(--accent),#ff4500);color:#fff;border:none;border-radius:10px;font-family:'Orbitron',monospace;font-size:.9rem;font-weight:700;letter-spacing:2px;cursor:pointer;transition:all .3s;box-shadow:0 6px 20px rgba(255,107,0,.35);}
+    .auth-btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(255,107,0,.5);}
+    .auth-btn:disabled{opacity:.7;cursor:not-allowed;transform:none;}
+    .pw-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:1rem;padding:.2rem;}
+    .forgot-link{text-align:right;font-size:.85rem;}
+    .forgot-link a{color:var(--blue);text-decoration:none;font-weight:600;}
+    .terms-check{display:flex;align-items:center;gap:.6rem;font-size:.85rem;color:var(--text-muted);cursor:pointer;}
+    .terms-check input[type=checkbox]{width:16px;height:16px;accent-color:var(--accent);}
+    .terms-check a{color:var(--accent);text-decoration:none;}
+    .strength-bar{height:4px;background:var(--bg-dark);border-radius:2px;overflow:hidden;display:none;}
+    .strength-fill{height:100%;width:0%;border-radius:2px;transition:width .3s,background .3s;}
+    .strength-text{font-size:.78rem;color:var(--text-muted);display:none;}
+    /* Step 2 */
+    .user-chip{display:flex;align-items:center;gap:.8rem;background:rgba(0,200,255,.08);border:1px solid var(--border-blue);border-radius:10px;padding:.7rem 1rem;font-size:.88rem;color:var(--blue);font-weight:600;}
+    .user-chip img{width:36px;height:36px;border-radius:50%;object-fit:cover;}
+    .yt-box{background:linear-gradient(135deg,rgba(255,0,0,.08),rgba(255,107,0,.05));border:1px solid rgba(255,0,0,.25);border-radius:14px;padding:1.8rem;text-align:center;}
+    .yt-icon{font-size:3.5rem;margin-bottom:.6rem;}
+    .yt-title{font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;color:var(--text);margin-bottom:.5rem;}
+    .yt-desc{color:var(--text-muted);font-size:.88rem;line-height:1.6;margin-bottom:1.2rem;}
+    .yt-channel{font-weight:700;color:#ff0000;font-size:1rem;}
+    .btn-sub{display:inline-flex;align-items:center;gap:.5rem;background:#ff0000;color:#fff;border:none;border-radius:8px;padding:.75rem 1.6rem;font-family:'Orbitron',monospace;font-size:.82rem;font-weight:700;letter-spacing:1px;cursor:pointer;text-decoration:none;transition:all .2s;margin-bottom:1rem;box-shadow:0 4px 16px rgba(255,0,0,.3);}
+    .btn-sub:hover{background:#cc0000;transform:translateY(-1px);}
+    /* Countdown timer style */
+    .btn-verify{width:100%;padding:1rem;background:linear-gradient(135deg,#00c853,#00a040);color:#fff;border:none;border-radius:10px;font-family:'Orbitron',monospace;font-size:.85rem;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all .2s;box-shadow:0 4px 16px rgba(0,200,83,.3);margin-top:.5rem;position:relative;overflow:hidden;}
+    .btn-verify::before{content:'';position:absolute;top:0;left:0;height:100%;background:rgba(0,0,0,.2);transition:width linear;}
+    .btn-verify:hover{transform:translateY(-1px);}
+    .btn-verify:disabled{opacity:.5;cursor:not-allowed;transform:none;background:#444;}
+    .verify-hint{font-size:.78rem;color:var(--text-muted);margin-top:.6rem;text-align:center;}
+    .countdown-text{font-size:.8rem;color:var(--accent);margin-top:.4rem;text-align:center;font-weight:700;}
+    .back-link{text-align:center;font-size:.82rem;color:var(--text-muted);}
+    .back-link a{color:var(--accent);font-weight:700;text-decoration:none;cursor:pointer;}
+    .auth-error{background:rgba(255,51,102,.12);border:1px solid rgba(255,51,102,.3);border-radius:8px;padding:.75rem 1rem;color:var(--red);font-size:.9rem;font-weight:600;display:none;align-items:center;gap:.5rem;}
+    .auth-error.show{display:flex;}
+    .auth-success{background:rgba(0,255,136,.12);border:1px solid rgba(0,255,136,.3);border-radius:8px;padding:.75rem 1rem;color:var(--green);font-size:.9rem;font-weight:600;display:none;align-items:center;gap:.5rem;}
+    .auth-success.show{display:flex;}
+    .spinner{width:18px;height:18px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:.5rem;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .auth-particle{position:absolute;width:3px;height:3px;border-radius:50%;background:var(--accent);animation:float linear infinite;pointer-events:none;}
+    @keyframes float{0%{transform:translateY(100vh) rotate(0deg);opacity:0}10%{opacity:1}90%{opacity:.5}100%{transform:translateY(-100px) rotate(720deg);opacity:0}}
+    .login-splash{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:9999;background:radial-gradient(circle at 50% 35%,rgba(255,107,0,.14),transparent 55%),linear-gradient(140deg,#04060c,#101520 60%,#0a0e1a);}
+    .login-splash::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,107,0,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,107,0,.05) 1px,transparent 1px);background-size:50px 50px;opacity:.3;animation:gridMove 3s linear infinite;}
+    .login-splash::after{content:'';position:absolute;inset:0;background:radial-gradient(circle,transparent 45%,rgba(0,0,0,.45) 100%);}
+    .login-splash.show{display:flex;}
+    .splash-content{text-align:center;position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;}
+    .splash-badge{font-size:.72rem;letter-spacing:2px;font-weight:700;color:var(--blue);border:1px solid var(--border-blue);background:rgba(0,200,255,.12);padding:.3rem .7rem;border-radius:999px;margin-bottom:1rem;animation:badgeIn .5s ease both;}
+    .splash-logo{font-family:'Orbitron',monospace;font-size:clamp(2.2rem,8vw,4.5rem);font-weight:900;letter-spacing:4px;color:#fff;text-shadow:0 0 8px rgba(255,107,0,.25);margin-bottom:1.1rem;animation:logoRise .7s cubic-bezier(.2,.9,.2,1) both;}
+    .splash-sub{font-size:.9rem;color:var(--text-muted);letter-spacing:1.2px;margin-bottom:1.6rem;animation:fadeIn .7s .15s both;}
+    .splash-loading-bar{width:min(280px,75vw);height:6px;background:rgba(255,255,255,0.1);border-radius:999px;margin:0 auto 1rem auto;overflow:hidden;position:relative;}
+    .splash-loading-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:linear-gradient(90deg, #ff4500, #ff8c00);box-shadow:0 0 15px #ff4500;animation:fillBar 2s cubic-bezier(0.25, 1, 0.5, 1) forwards;}
+    .splash-text{font-family:'Orbitron', monospace;font-size:.78rem;color:var(--accent);letter-spacing:3px;animation:blinkText .7s infinite alternate;}
+    
+    @keyframes gridMove {from{transform:translateY(0)}to{transform:translateY(50px)}}
+    @keyframes badgeIn {from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes logoRise {from{opacity:0;transform:translateY(18px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+    @keyframes fadeIn {from{opacity:0}to{opacity:1}}
+    @keyframes fillBar {0%{width:0%;} 100%{width:100%;}}
+    @keyframes blinkText {0%{opacity:0.3;} 100%{opacity:1;}}
+  </style>
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-bg"></div>
+    <div id="authParticles"></div>
+
+    <div class="auth-container">
+      <div class="auth-logo">
+        <a href="index.html">FF<span class="accent">Sens</span>Pro</a>
+        <p>🎯 Free Fire Sensitivity Generator</p>
+      </div>
+
+      <div class="auth-card">
+        <div class="auth-error" id="authError">⚠️ <span id="errorText"></span></div>
+        <div class="auth-success" id="authSuccess">✅ <span id="successText"></span></div>
+
+        <!-- ══ STEP 1 ══ -->
+        <div class="step-section active" id="step1">
+          <div class="step-title">🔐 SIGN IN TO CONTINUE</div>
+          <div class="step-sub">Sign in to access your sensitivity generator</div>
+
+          <div class="auth-divider">Use your account</div>
+
+          <div class="auth-tabs">
+            <button class="auth-tab active" id="loginTab" onclick="switchTab('login')">🔐 LOGIN</button>
+            <button class="auth-tab" id="signupTab" onclick="switchTab('signup')">📝 SIGN UP</button>
+          </div>
+
+          <div class="form-section active" id="loginForm">
+            <div class="auth-form-group">
+              <label>Email or Username</label>
+              <div class="auth-input-wrap">
+                <span class="input-icon">👤</span>
+                <input type="text" id="loginEmail" placeholder="Enter email or username" autocomplete="username"/>
+              </div>
+            </div>
+            <div class="auth-form-group">
+              <label>Password</label>
+              <div class="auth-input-wrap">
+                <span class="input-icon">🔑</span>
+                <input type="password" id="loginPassword" placeholder="Enter password" autocomplete="current-password"/>
+                <button class="pw-toggle" onclick="togglePass('loginPassword',this)" type="button">👁️</button>
+              </div>
+            </div>
+            <div class="forgot-link"><a href="#" onclick="showForgot()">Forgot Password?</a></div>
+            <button class="auth-btn" id="loginBtn" onclick="doLogin()">⚡ LOGIN</button>
+            <p style="text-align:center;color:var(--text-muted);font-size:.82rem">
+              No account? <a href="#" style="color:var(--accent);font-weight:700" onclick="switchTab('signup')">Sign up free →</a>
+            </p>
+          </div>
+
+          <div class="form-section" id="signupForm">
+            <div class="auth-form-group">
+              <label>Username</label>
+              <div class="auth-input-wrap">
+                <span class="input-icon">🎮</span>
+                <input type="text" id="signupUsername" placeholder="Your gamer name" oninput="validateUsername(this)"/>
+              </div>
+            </div>
+            <div class="auth-form-group">
+              <label>Email</label>
+              <div class="auth-input-wrap">
+                <span class="input-icon">📧</span>
+                <input type="email" id="signupEmail" placeholder="your@email.com"/>
+              </div>
+            </div>
+            <div class="auth-form-group">
+              <label>Password</label>
+              <div class="auth-input-wrap">
+                <span class="input-icon">🔑</span>
+                <input type="password" id="signupPassword" placeholder="Create a strong password" oninput="checkStrength(this.value)"/>
+                <button class="pw-toggle" onclick="togglePass('signupPassword',this)" type="button">👁️</button>
+              </div>
+              <div class="strength-bar" id="strengthBar"><div class="strength-fill" id="strengthFill"></div></div>
+              <div class="strength-text" id="strengthText"></div>
+            </div>
+            <div class="auth-form-group">
+              <label>Confirm Password</label>
+              <div class="auth-input-wrap">
+                <span class="input-icon">🔒</span>
+                <input type="password" id="signupConfirm" placeholder="Repeat your password"/>
+                <button class="pw-toggle" onclick="togglePass('signupConfirm',this)" type="button">👁️</button>
+              </div>
+            </div>
+            <label class="terms-check">
+              <input type="checkbox" id="termsCheck"/>
+              I agree to <a href="#">Terms</a> &amp; <a href="#">Privacy Policy</a>
+            </label>
+            <button class="auth-btn" id="signupBtn" onclick="doSignup()">🚀 CREATE ACCOUNT</button>
+            <p style="text-align:center;color:var(--text-muted);font-size:.82rem">
+              Already have account? <a href="#" style="color:var(--accent);font-weight:700" onclick="switchTab('login')">Login →</a>
+            </p>
+          </div>
+        </div>
+
+        <!-- ══ STEP 2: SUBSCRIBE ══ -->
+        <div class="step-section" id="step2">
+          <div class="user-chip" id="userChip">
+            <img id="userAvatar" src="" alt="" onerror="this.style.display='none'"/>
+            <div>
+              <div id="userChipName" style="font-weight:700">Loading...</div>
+              <div id="userChipEmail" style="font-size:.75rem;opacity:.7"></div>
+            </div>
+          </div>
+
+          <div class="yt-box">
+            <div class="yt-icon">📺</div>
+            <div class="yt-title">ONE LAST STEP!</div>
+            <div class="yt-desc">
+              Subscribe to <span class="yt-channel">Sanstar Aura</span> on YouTube<br/>
+              to unlock your sensitivity generator!<br/>
+              <small style="opacity:.7">Free &amp; takes only 2 seconds 🎯</small>
+            </div>
+
+            <a class="btn-sub"
+               href="https://www.youtube.com/@Sanstar_Aura?sub_confirmation=1"
+               target="_blank"
+               id="subLink"
+               onclick="onSubClick()">
+              ▶ Subscribe Now
+            </a>
+
+            <br/>
+            <button class="btn-verify" id="verifyBtn" onclick="verifyAndUnlock()" disabled>
+              ✅ I SUBSCRIBED — VERIFY & UNLOCK
+            </button>
+            <div class="verify-hint" id="verifyHint">Click Subscribe above first, then verify</div>
+            <div class="countdown-text" id="countdownText"></div>
+          </div>
+
+          <div class="back-link">
+            <a onclick="goBack()">← Back / Switch Account</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <div class="login-splash" id="loginSplash">
+    <div class="splash-content">
+      <div class="splash-badge">AUTH SUCCESS</div>
+      <div class="splash-logo">FF<span class="accent">Sens</span>Pro</div>
+      <div class="splash-sub">Loading your battle dashboard...</div>
+      <div class="splash-loading-bar"><div class="splash-loading-fill"></div></div>
+      <div class="splash-text">INITIALIZING</div>
+    </div>
+  </div>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import { getAuth, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCXJm8LAV9f3sXJRoupF8dJkTYwmBNLKoA",
+      authDomain: "ffsensipro-6a9f7.firebaseapp.com",
+      projectId: "ffsensipro-6a9f7",
+      storageBucket: "ffsensipro-6a9f7.firebasestorage.app",
+      messagingSenderId: "574192550218",
+      appId: "1:574192550218:web:e6d42eece43e3a7e3bc1b3"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    var currentUser = null;
+    var subClicked = false;
+    var countdownTimer = null;
+
+    // Strict login page: always start fresh, never auto-login
+    try { localStorage.removeItem('ffsp_session'); } catch(e) {}
+    signOut(auth).catch(function(){});
+
+
+    function showStep2(user) {
+      document.getElementById('userChipName').textContent = '👋 ' + (user.displayName || user.email);
+      document.getElementById('userChipEmail').textContent = user.email;
+      document.getElementById('userAvatar').src = user.photoURL || '';
+      document.getElementById('step1').classList.remove('active');
+      document.getElementById('step2').classList.add('active');
+      clearMessages();
+    }
+
+    // Subscribe click — start 5 second countdown then enable verify
+    window.onSubClick = function() {
+      subClicked = true;
+      var btn = document.getElementById('verifyBtn');
+      var hint = document.getElementById('verifyHint');
+      var countdown = document.getElementById('countdownText');
+      hint.textContent = 'Waiting for subscription to register...';
+      hint.style.color = 'var(--accent)';
+      btn.disabled = true;
+
+      var secs = 5;
+      countdown.textContent = 'Verify unlocks in ' + secs + 's...';
+      countdownTimer = setInterval(function() {
+        secs--;
+        if (secs <= 0) {
+          clearInterval(countdownTimer);
+          btn.disabled = false;
+          countdown.textContent = '';
+          hint.textContent = 'Now click Verify & Unlock! ✅';
+          hint.style.color = 'var(--green)';
+        } else {
+          countdown.textContent = 'Verify unlocks in ' + secs + 's...';
+        }
+      }, 1000);
+    };
+
+    // Verify & Unlock — save to Firestore, redirect
+    window.verifyAndUnlock = async function() {
+      if (!subClicked) { showError('Please click Subscribe button first!'); return; }
+      if (!currentUser) { showError('Session expired. Please sign in again.'); goBack(); return; }
+
+      var btn = document.getElementById('verifyBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> UNLOCKING...';
+      clearMessages();
+
+      try {
+        await setDoc(doc(db, 'users', currentUser.uid), {
+          subscribed: true,
+          subscribedAt: new Date().toISOString(),
+          displayName: currentUser.displayName || '',
+          email: currentUser.email || '',
+          photoURL: currentUser.photoURL || ''
+        }, { merge: true });
+
+        redirecting = true;
+        saveSession(currentUser);
+        showSuccess('🎉 Unlocked! Redirecting to generator...');
+        setTimeout(() => { redirectWithSplash(); }, 1500);
+      } catch(e) {
+        btn.disabled = false;
+        btn.textContent = '✅ I SUBSCRIBED — VERIFY & UNLOCK';
+        showError('Something went wrong. Please try again.');
+      }
+    };
+
+    function saveSession(user) {
+      localStorage.setItem('ffsp_session', JSON.stringify({
+        loggedIn: true,
+        subscribed: true,
+        username: user.displayName || user.email,
+        email: user.email,
+        picture: user.photoURL || '',
+        uid: user.uid
+      }));
+    }
+
+    function redirectWithSplash() {
+      var splash = document.getElementById('loginSplash');
+      if (splash) splash.classList.add('show');
+      setTimeout(function() {
+        window.location.href = 'generator.html';
+      }, 2000);
+    }
+
+    window.goBack = function() {
+      subClicked = false;
+      clearInterval(countdownTimer);
+      document.getElementById('verifyBtn').disabled = true;
+      document.getElementById('verifyHint').textContent = 'Click Subscribe above first, then verify';
+      document.getElementById('verifyHint').style.color = 'var(--text-muted)';
+      document.getElementById('countdownText').textContent = '';
+      document.getElementById('step2').classList.remove('active');
+      document.getElementById('step1').classList.add('active');
+      clearMessages();
+    };
+
+    // ── Email/Password Login ──
+    window.doLogin = async function() {
+      clearMessages();
+      var id = document.getElementById('loginEmail').value.trim();
+      var pw = document.getElementById('loginPassword').value;
+      if (!id || !pw) { showError('Please fill in all fields.'); return; }
+      var btn = document.getElementById('loginBtn');
+      btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> LOGGING IN...';
+      try {
+        var email = id.includes('@') ? id : await getUserEmail(id);
+        if (!email) { showError('Username not found. Please use email or sign up.'); return; }
+        const cred = await signInWithEmailAndPassword(auth, email, pw);
+        currentUser = cred.user;
+        const snap = await getDoc(doc(db, 'users', currentUser.uid));
+        if (snap.exists() && snap.data().subscribed) {
+          saveSession(currentUser);
+          redirectWithSplash();
+        } else {
+          showStep2(currentUser);
+        }
+      } catch(e) {
+        var msg = e.code === 'auth/wrong-password' ? 'Incorrect password.' :
+                  e.code === 'auth/user-not-found' ? 'Account not found. Please sign up.' :
+                  e.code === 'auth/invalid-credential' ? 'Incorrect email or password.' : e.message;
+        showError(msg);
+      } finally {
+        btn.disabled = false; btn.textContent = '⚡ LOGIN';
+      }
+    };
+
+    // ── Signup ──
+    window.doSignup = async function() {
+      clearMessages();
+      var un = document.getElementById('signupUsername').value.trim();
+      var em = document.getElementById('signupEmail').value.trim();
+      var pw = document.getElementById('signupPassword').value;
+      var cf = document.getElementById('signupConfirm').value;
+      var terms = document.getElementById('termsCheck').checked;
+      if (!un||!em||!pw||!cf) { showError('Please fill in all fields.'); return; }
+      if (un.length < 3) { showError('Username must be at least 3 characters.'); return; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) { showError('Invalid email address.'); return; }
+      if (pw.length < 6) { showError('Password must be at least 6 characters.'); return; }
+      if (pw !== cf) { showError('Passwords do not match.'); return; }
+      if (!terms) { showError('Please accept the Terms.'); return; }
+      var btn = document.getElementById('signupBtn');
+      btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> CREATING...';
+      try {
+        const cred = await createUserWithEmailAndPassword(auth, em, pw);
+        currentUser = cred.user;
+        await setDoc(doc(db, 'users', currentUser.uid), { username: un, email: em, createdAt: new Date().toISOString() }, { merge: true });
+        await setDoc(doc(db, 'usernames', un.toLowerCase()), { uid: currentUser.uid, email: em });
+        showStep2(currentUser);
+      } catch(e) {
+        showError(e.code === 'auth/email-already-in-use' ? 'Email already registered. Please login.' : e.message);
+      } finally {
+        btn.disabled = false; btn.textContent = '🚀 CREATE ACCOUNT';
+      }
+    };
+
+    async function getUserEmail(username) {
+      try {
+        const snap = await getDoc(doc(db, 'usernames', username.toLowerCase()));
+        return snap.exists() ? snap.data().email : null;
+      } catch(e) { return null; }
+    }
+
+    window.showForgot = async function() {
+      var em = prompt('Enter your registered email:');
+      if (em) {
+        try { await sendPasswordResetEmail(auth, em); showSuccess('Password reset email sent!'); }
+        catch(e) { showError('No account found with that email.'); }
+      }
+    };
+
+    window.showError = function(msg) {
+      document.getElementById('errorText').textContent = msg;
+      document.getElementById('authError').classList.add('show');
+      document.getElementById('authSuccess').classList.remove('show');
+    };
+    window.showSuccess = function(msg) {
+      document.getElementById('successText').textContent = msg;
+      document.getElementById('authSuccess').classList.add('show');
+      document.getElementById('authError').classList.remove('show');
+    };
+    window.clearMessages = function() {
+      document.getElementById('authError').classList.remove('show');
+      document.getElementById('authSuccess').classList.remove('show');
+    };
+  </script>
+
+  <script>
+    // Particles
+    (function(){
+      var c = document.getElementById('authParticles');
+      c.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:1';
+      for(var i=0;i<18;i++){
+        var p=document.createElement('div'); p.className='auth-particle';
+        var s=Math.random()*4+2;
+        p.style.cssText='width:'+s+'px;height:'+s+'px;left:'+Math.random()*100+'%;animation-duration:'+(Math.random()*12+8)+'s;animation-delay:'+(Math.random()*8)+'s;opacity:'+(Math.random()*.4+.2)+(i%3===0?';background:#00c8ff':'');
+        c.appendChild(p);
+      }
+    })();
+
+    function switchTab(tab){
+      if(typeof clearMessages==='function') clearMessages();
+      document.getElementById('loginForm').classList.toggle('active',tab==='login');
+      document.getElementById('signupForm').classList.toggle('active',tab==='signup');
+      document.getElementById('loginTab').classList.toggle('active',tab==='login');
+      document.getElementById('signupTab').classList.toggle('active',tab==='signup');
+    }
+    function togglePass(id,btn){ var i=document.getElementById(id); if(i.type==='password'){i.type='text';btn.textContent='🙈';}else{i.type='password';btn.textContent='👁️';} }
+    function validateUsername(inp){ inp.value=inp.value.replace(/[^a-zA-Z0-9_]/g,''); }
+    function checkStrength(val){
+      var bar=document.getElementById('strengthBar'),fill=document.getElementById('strengthFill'),txt=document.getElementById('strengthText');
+      if(!val){bar.style.display='none';txt.style.display='none';return;}
+      bar.style.display='block';txt.style.display='block';
+      var sc=0;if(val.length>=8)sc++;if(/[A-Z]/.test(val))sc++;if(/[0-9]/.test(val))sc++;if(/[^A-Za-z0-9]/.test(val))sc++;
+      var l=[{pct:25,color:'#ff3366',label:'⚠️ Weak'},{pct:50,color:'#ffd600',label:'🟡 Fair'},{pct:75,color:'#00c8ff',label:'🔵 Good'},{pct:100,color:'#00ff88',label:'✅ Strong'}][sc-1]||{pct:25,color:'#ff3366',label:'⚠️ Weak'};
+      fill.style.width=l.pct+'%';fill.style.background=l.color;txt.textContent=l.label;txt.style.color=l.color;
+    }
+    // Enter key disabled to prevent auto-submit
+  </script>
+</body>
+</html>
